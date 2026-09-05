@@ -1,0 +1,12 @@
+{
+  "name": "vibe-coding-kit",
+  "description": "초보용 올인원 바이브 코딩 키트",
+  "owner": { "name": "dongho108" },
+  "plugins": [
+    {
+      "name": "vibe-coding-kit",
+      "source": "./",
+      "description": "아이디어부터 결제되는 서비스까지. 기술 선택을 대신 내려주는 올인원 키트"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "vibe-coding-kit",
+  "version": "0.1.0",
+  "description": "터미널이 처음이어도 아이디어부터 결제되는 서비스까지. Next.js + Supabase + Vercel + 토스페이먼츠로 정해진 길을 안내합니다.",
+  "author": { "name": "dongho108" },
+  "repository": "https://github.com/dongho108/vibe-coding-kit",
+  "license": "MIT",
+  "keywords": ["vibe-coding", "nextjs", "supabase", "vercel", "tosspayments", "korean", "beginner"]
+}

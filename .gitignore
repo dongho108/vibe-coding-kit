@@ -1,0 +1,9 @@
+# OMC session/runtime state
+.omc/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# OS
+.DS_Store
