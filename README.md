@@ -10,25 +10,36 @@
 curl -fsSL https://raw.githubusercontent.com/dongho108/vibe-coding-kit/main/install.sh | bash
 ```
 
-설치가 끝나면 클로드 코드를 열고 `/setup` 이라고 치세요.
+설치가 끝나면 클로드 코드를 열고 `/start` 이라고 치세요.
 
 ## 순서
 
+계정부터 만들면 지칩니다. **내 컴퓨터에서 먼저 돌려보고, 배포할 때 계정을 만드는 순서**를 권합니다.
+
 ```
-/setup   환경과 계정 4개 준비
+/start local     Node만 확인. 계정은 아직 안 만듭니다
    ↓
-/plan    아이디어를 기획서로. 여기서 제품 형태를 고릅니다
+/plan            아이디어를 기획서로. 여기서 제품 형태를 고릅니다
    ↓
-/design  색·폰트 정하고 화면 시안
+/build local     Next.js 뼈대. 데이터는 임시 파일에
    ↓
-/stack   Next.js 뼈대와 데이터베이스
+/design          색·폰트 정하고 화면 만들기 → 내 컴퓨터에서 가게가 보입니다
    ↓
-   ...   기능 만들기 (클로드가 알아서)
+/start deploy    GitHub·Vercel 계정
    ↓
-/ship    배포하고 결제 붙이기
+/publish only    인터넷 주소가 생깁니다
+   ↓
+/start accounts  Supabase·Google·토스 계정
+   ↓
+/build           데이터베이스와 구글 로그인 붙이기 (임시 데이터를 옮깁니다)
+   ↓
+/pay             결제
+   ↓
+/publish         로그인 주소 재등록, 웹훅, 최종 확인
 ```
 
-각 단계가 끝나면 다음에 칠 명령어를 알려줍니다. 외울 건 `/setup` 하나뿐입니다.
+한 번에 전부 준비하고 싶으면 `/start` 만 치고 "전부"라고 답하면 됩니다.
+각 단계가 끝나면 다음에 칠 명령어를 알려줍니다. 외울 건 `/start` 하나뿐입니다.
 
 ## 정해져 있는 것
 
@@ -66,12 +77,12 @@ curl -fsSL https://raw.githubusercontent.com/dongho108/vibe-coding-kit/main/inst
 직접 만든 것과 좋은 외부 스킬을 한 저장소에 모아뒀습니다. 따로 설치할 게 없습니다.
 
 **진행 스킬 (직접 제작)**
-`setup` `plan` `design` `stack` `ship` `toss-payments`
+`start` `plan` `build` `design` `publish` `pay`
 
 **지식 스킬 (외부, 출처는 [VENDOR.md](VENDOR.md))**
 `supabase` `supabase-postgres-best-practices` `deploy-to-vercel` `react-best-practices`
 `composition-patterns` `web-design-guidelines` `vercel-cli-with-tokens`
-`next-cache-components-optimizer` `next-dev-loop`
+`next-cache-components-optimizer` `next-dev-loop` `nextjs-developer` `nextjs-best-practices` `nextjs-supabase-auth`
 `frontend-design` `webapp-testing` `ui-ux-pro-max` `agent-browser`
 
 ## 라이선스

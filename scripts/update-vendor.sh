@@ -14,6 +14,8 @@ clone vercel-labs/agent-skills vercel
 clone anthropics/skills anthropic
 clone nextlevelbuilder/ui-ux-pro-max-skill uiux
 clone vercel-labs/agent-browser agentbrowser
+clone jeffallan/claude-skills jeffallan
+clone sickn33/agentic-awesome-skills awesome
 git clone --depth 1 --filter=blob:none --sparse -q https://github.com/vercel/next.js.git "$TMP/next"
 git -C "$TMP/next" sparse-checkout set skills
 echo "next $(git -C "$TMP/next" rev-parse --short HEAD)"
@@ -33,12 +35,19 @@ for s in frontend-design webapp-testing; do
 done
 cp_skill "$TMP/uiux/.claude/skills/ui-ux-pro-max" ui-ux-pro-max
 cp_skill "$TMP/agentbrowser/skills/agent-browser" agent-browser
+cp_skill "$TMP/jeffallan/skills/nextjs-developer" nextjs-developer
+for s in nextjs-best-practices nextjs-supabase-auth; do
+  cp_skill "$TMP/awesome/skills/$s" "$s"
+done
 
 cp "$TMP/supabase/LICENSE" "$R/licenses/supabase-agent-skills.LICENSE"
 cp "$TMP/next/license.md" "$R/licenses/nextjs.LICENSE"
 cp "$TMP/anthropic/skills/frontend-design/LICENSE.txt" "$R/licenses/anthropics-skills.LICENSE"
 cp "$TMP/uiux/LICENSE" "$R/licenses/ui-ux-pro-max.LICENSE"
 cp "$TMP/agentbrowser/LICENSE" "$R/licenses/agent-browser.LICENSE"
+cp "$TMP/jeffallan/LICENSE" "$R/licenses/jeffallan-claude-skills.LICENSE"
+cp "$TMP/awesome/LICENSE" "$R/licenses/agentic-awesome-skills.LICENSE"
+cp "$TMP/awesome/LICENSE-CONTENT" "$R/licenses/agentic-awesome-skills-CONTENT.LICENSE"
 
 find "$R/skills" -name "*.zip" -delete
 

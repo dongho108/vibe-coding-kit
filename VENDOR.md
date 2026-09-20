@@ -7,7 +7,7 @@
 
 ## 목록
 
-2026-08-31 확인. 전부 현행 저장소이며 폐기 예고 없음.
+2026-08-31 확인, 2026-09-20 Next.js 스킬 3개 추가. 전부 현행 저장소이며 폐기 예고 없음.
 
 | 스킬 | 원본 | 라이선스 | 커밋 |
 |---|---|---|---|
@@ -24,8 +24,11 @@
 | webapp-testing | anthropics/skills | Apache-2.0 | 3b3fad9 |
 | ui-ux-pro-max | nextlevelbuilder/ui-ux-pro-max-skill | MIT | d279284 |
 | agent-browser | vercel-labs/agent-browser | Apache-2.0 | 118af8e |
+| nextjs-developer | jeffallan/claude-skills | MIT | 882ef55 |
+| nextjs-best-practices | sickn33/agentic-awesome-skills | MIT (코드) / CC BY 4.0 (문서) | 2fd5ecf |
+| nextjs-supabase-auth | sickn33/agentic-awesome-skills (원출처 vibeship-spawner-skills, Apache-2.0) | MIT (코드) / CC BY 4.0 (문서) | 2fd5ecf |
 
-원본 라이선스 전문은 `licenses/` 에 있다.
+원본 라이선스 전문은 `licenses/` 에 있다. `sickn33/agentic-awesome-skills` 는 코드 MIT, 문서 콘텐츠 CC BY 4.0 이중 라이선스라 둘 다 담았다. `nextjs-supabase-auth` 의 SKILL.md 프론트매터에 원출처(vibeship-spawner-skills, Apache 2.0)가 적혀 있어 그대로 둔다.
 `vercel-labs/agent-skills` 만 루트에 LICENSE 파일이 없고 README의 License 절에 MIT로 선언한다.
 `licenses/vercel-agent-skills.LICENSE` 에 그 사실을 적어뒀다.
 
@@ -69,4 +72,4 @@ agent-browser skills get core
 
 **토스페이먼츠 스킬은 어디에도 없다.** skills.sh, GitHub 모두 확인했고 결제 연동 스킬은 존재하지 않는다.
 (토스증권 Open API용 `BEOKS/tossinvest-skill` 은 다른 물건이다.)
-그래서 `skills/toss-payments` 는 이 레포에서 직접 만든다. 이게 이 저장소의 가장 뚜렷한 차별점이다.
+그래서 `skills/pay` 는 이 레포에서 직접 만든다. 이게 이 저장소의 가장 뚜렷한 차별점이다.
