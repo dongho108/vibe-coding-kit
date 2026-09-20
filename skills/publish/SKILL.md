@@ -47,11 +47,15 @@ description: >
 
 ### 1단계. 배포
 
-GitHub에 올리고 Vercel에 연결한다.
+GitHub에 올리고 Vercel에 연결한다. `/start deploy` 에서 gh 로그인이 끝나 있어야 한다. 안 돼 있으면 거기로 돌려보낸다.
 
 ```bash
-git add -A && git commit -m "first" && git push
+gh auth status
+git add -A && git commit -m "first"
+gh repo create <폴더이름> --private --source=. --remote=origin --push
 ```
+
+이미 원격 저장소가 있으면 `gh repo create` 대신 `git push` 만 한다. 저장소는 비공개(`--private`)로 만든다. 비밀 키가 실수로 올라가도 남이 못 본다.
 
 Vercel에서 **Add New → Project** → 저장소 선택 → Import.
 
@@ -161,3 +165,5 @@ Vercel이 준 `*.vercel.app` 주소로 계속 가도 된다. 사용자에게 먼
 | 로컬은 되는데 배포하면 500 | 서버 환경변수 누락. Vercel 로그를 본다 |
 | 웹훅이 안 온다 | 등록한 URL이 로컬이거나, 라우트가 POST를 안 받는다 |
 | 빌드가 실패한다 | 타입 에러가 대부분이다. `npm run build` 를 로컬에서 먼저 돌려본다 |
+| `gh repo create` 에서 로그인 오류 | `/start deploy` 로 돌아가 `gh auth login` |
+| Vercel에서 저장소가 안 보인다 | Vercel의 GitHub 권한 화면에서 해당 저장소를 허용한다 |
