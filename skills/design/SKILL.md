@@ -53,7 +53,55 @@ B. 색이 또렷하고 활기찬 느낌. 젊은 사용자를 노릴 때 좋아�
 서비스 성격을 보면 A가 맞을 것 같은데 어떠세요?
 ```
 
-### 2단계. shadcn/ui 설치
+### 2단계. 디자인 문서와 미리보기
+
+방향이 정해지면 문서로 남긴다. 먼저 `design-system/<서비스-slug>/MASTER.md` 가 이미 있는지 보고,
+있으면 읽기만 한다. (`--force` 는 사용자가 덮어쓰라고 할 때만)
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py" \
+  "<서비스 성격 키워드>" --design-system --persist -p "<서비스 영문 이름>" --output-dir "<프로젝트 루트>"
+```
+
+- **`-p` 에는 영문 이름을 넣는다.** 한글 이름을 넣으면 폴더가 `design-system/default/` 로 만들어진다.
+  "숨 요가"라면 `-p "Soom Yoga"` 처럼 로마자로 바꿔 넣는다.
+- **저장한 뒤 글꼴을 고친다.** 검색 결과의 글꼴은 대부분 영문 전용이라 한글이 없다.
+  `MASTER.md` 의 Typography 항목(제목·본문 글꼴, 불러오는 주소)을 Pretendard로 바꿔 적는다.
+
+**문서만 주고 끝내지 마라.** 초보는 색 코드와 폰트 이름을 읽고 느낌을 떠올리지 못한다.
+`MASTER.md` 옆에 `preview.html` 한 장을 만들어 브라우저로 열어준다.
+
+- 파일 하나로 끝낸다. 빌드도 서버도 필요 없고, 더블클릭으로 열린다.
+  폰트만 CDN으로 불러온다 (Pretendard: `https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css`).
+- 값은 `MASTER.md` 와 1단계에서 합의한 방향에서 가져온다. 여기서 새 색을 지어내지 마라.
+- 담을 것은 이 정도면 충분하다. 길게 만들지 마라.
+  1. 서비스 이름과 한 줄 소개가 들어간 첫 화면(히어로) 한 덩어리, 주 버튼·보조 버튼 포함
+  2. 색 견본: 주 색상, 배경, 글자색, 회색 몇 단계. 각 칸에 색 코드와 "버튼·링크에 써요" 같은 한 줄 용도
+  3. 글자 크기 샘플: 제목·소제목·본문·작은 글씨를 **한국어 문장**으로 (한글 렌더링 확인용)
+  4. 부품 샘플: 버튼, 입력칸, 카드 하나씩. 정한 모서리 둥글기가 보이게
+- 라이트·다크 둘 다 정했으면 위쪽에 전환 버튼 하나를 둔다.
+- 화면 폭 390px 에서도 깨지지 않게 만든다.
+- 이 파일은 느낌을 보여주는 용도다. 실제 화면 코드는 5단계에서 shadcn/Tailwind로 따로 만든다.
+  (그래서 여기서는 "직접 CSS 금지" 규칙의 예외다.)
+
+만들었으면 바로 연다.
+
+```bash
+open design-system/<서비스-slug>/preview.html        # macOS
+start design-system/<서비스-slug>/preview.html       # Windows
+```
+
+그리고 이렇게 묻는다.
+
+```
+브라우저에 디자인 미리보기를 띄웠어요.
+전체적인 느낌이 괜찮은지 봐주세요. 색이 너무 진하다, 더 둥글었으면 좋겠다 같은 말이면 충분해요.
+```
+
+고칠 점이 나오면 `MASTER.md` 와 `preview.html` 을 같이 고치고 다시 연다.
+사용자가 좋다고 할 때까지 다음 단계로 넘어가지 않는다.
+
+### 3단계. shadcn/ui 설치
 
 Next.js 프로젝트가 아직 없으면 `/build` 을 먼저 돌리라고 안내한다.
 (`/design` 과 `/build` 은 순서를 바꿔도 되지만, 시안을 실제 코드로 만들려면 프로젝트가 필요하다.)
@@ -70,9 +118,10 @@ npx shadcn@latest add button card input form dialog
 
 **한 번에 다 받지 마라.** 안 쓰는 컴포넌트가 쌓이면 나중에 뭐가 뭔지 모르게 된다.
 
-### 3단계. 토큰 고정
+### 4단계. 토큰 고정
 
 `app/globals.css` 의 CSS 변수와 폰트를 정한 톤에 맞춰 고친다.
+값은 2단계에서 사용자가 확인한 `preview.html` 과 똑같이 맞춘다. 미리보기와 실제 화면이 달라 보이면 안 된다.
 
 정해야 할 것은 이게 전부다.
 
@@ -84,7 +133,7 @@ npx shadcn@latest add button card input form dialog
 **색을 여러 개 만들지 마라.** 주 색상 하나에 회색 계열이면 충분하다.
 색이 늘어날수록 초보가 만든 티가 난다.
 
-### 4단계. 화면 시안
+### 5단계. 화면 시안
 
 기획서의 화면을 하나씩 만든다. `frontend-design` 을 여기서 부른다.
 
@@ -99,7 +148,7 @@ npm run dev
 
 `agent-browser` 로 직접 열어 스크린샷을 찍어 보여줘도 된다.
 
-### 5단계. 점검
+### 6단계. 점검
 
 전체 화면이 나오면 `web-design-guidelines` 로 훑는다.
 
@@ -110,7 +159,7 @@ npm run dev
 
 ## 완료 확인
 
-기획서에 적힌 화면 전부에 시안이 있고, `npm run dev` 로 띄워서 모바일 폭에서도 깨지지 않는다.
+`design-system/<서비스-slug>/` 에 `MASTER.md` 와 `preview.html` 이 있고, 기획서에 적힌 화면 전부에 시안이 있고, `npm run dev` 로 띄워서 모바일 폭에서도 깨지지 않는다.
 
 ## 다음
 
