@@ -1,0 +1,33 @@
+#!/bin/sh
+# vibe-coding-kit: 비밀 키가 커밋되지 않게 막는다.
+# /build 가 프로젝트의 .git/hooks/pre-commit 으로 복사한다.
+
+KEY_PATTERN='(sb_secret_|test_gsk_|live_gsk_|test_sk_|live_sk_|vca_|ghp_|github_pat_)[A-Za-z0-9_-]{8,}'
+found=0
+out="$(git rev-parse --git-dir)/vibe-secret-check.txt"
+
+git diff --cached --name-only --diff-filter=ACMR | while IFS= read -r f; do
+  case "$f" in
+    *.env.example) ;;
+    .env|.env.*|*/.env|*/.env.*)
+      echo "  - $f : 환경변수 파일"
+      continue
+      ;;
+  esac
+  # .env.example 을 포함한 나머지 파일은 내용에 키가 있는지 본다
+  hit=$(git diff --cached -U0 -- "$f" | grep '^+' | grep -oE "$KEY_PATTERN" | head -1)
+  [ -n "$hit" ] && echo "  - $f : 비밀 키로 보이는 값 ($(printf '%s' "$hit" | cut -c1-12)...)"
+done > "$out"
+
+if [ -s "$out" ]; then
+  found=1
+  echo ""
+  echo "커밋을 멈췄어요. 비밀 키가 GitHub에 올라갈 수 있어요."
+  cat "$out"
+  echo ""
+  echo "키는 .env.local 에만 두고 코드에서는 process.env 로 읽어주세요."
+  echo "파일을 커밋에서 빼려면: git restore --staged <파일>"
+  echo ""
+fi
+rm -f "$out"
+exit $found

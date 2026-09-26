@@ -49,13 +49,35 @@ description: >
 
 GitHub에 올리고 Vercel에 연결한다. `/start deploy` 에서 gh 로그인이 끝나 있어야 한다. 안 돼 있으면 거기로 돌려보낸다.
 
+커밋하기 전에 비밀 키가 섞이지 않았는지 확인한다.
+
 ```bash
 gh auth status
-git add -A && git commit -m "first"
+git check-ignore -q .env.local && echo "OK: .env.local 은 올라가지 않음"
+git add -A
+git diff --cached --name-only | grep -E '(^|/)\.env' | grep -v '\.env\.example$'
+```
+
+- `check-ignore` 에서 OK가 안 나오면 `.gitignore` 에 `.env*` 를 넣고 다시 한다.
+- 마지막 줄에서 파일 이름이 하나라도 나오면 멈춘다. `git restore --staged <파일>` 로 빼고 이유를 사용자에게 말한다.
+- `/build` 가 깔아둔 커밋 검사기가 있으면 커밋할 때 한 번 더 막아준다. 없으면(`.git/hooks/pre-commit`)
+  `/build` 의 1단계대로 지금 깐다. 검사기에 걸리면 `--no-verify` 로 건너뛰지 않는다.
+
+```bash
+git commit -m "first"
 gh repo create <폴더이름> --private --source=. --remote=origin --push
 ```
 
 이미 원격 저장소가 있으면 `gh repo create` 대신 `git push` 만 한다. 저장소는 비공개(`--private`)로 만든다. 비밀 키가 실수로 올라가도 남이 못 본다.
+
+**키가 이미 올라간 걸 발견하면** 파일을 지우고 다시 커밋하는 것으로는 부족하다. 커밋 기록에 남아 있다.
+그 키를 발급한 곳에서 **새 키를 발급받고 옛 키는 폐기**한 뒤 `.env.local` 과 Vercel 환경변수를 새 값으로 바꾼다.
+
+| 키 | 새로 발급하는 곳 |
+|---|---|
+| `SUPABASE_SECRET_KEY` | Supabase → Project Settings → API Keys |
+| `TOSS_SECRET_KEY` | 토스페이먼츠 개발자센터 → API 키 |
+| Vercel 토큰 | Vercel → Account Settings → Tokens |
 
 Vercel에서 **Add New → Project** → 저장소 선택 → Import.
 

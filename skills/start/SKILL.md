@@ -48,7 +48,7 @@ description: >
 |---|---|---|
 | `/start local`, "지금은 Node만", "계정은 나중에" | 0~1단계 (node·git) | `/plan` 안내. 계정 이야기는 꺼내지 않는다 |
 | `/start deploy`, "배포하려고" | 5단계 (GitHub 계정 + gh 설치·로그인 + Vercel) | `/publish` 안내 |
-| `/start accounts`, "로그인·결제 붙이려고" | 2~4단계 (Supabase·Google·토스) + 6~7단계 | `/build` 다시 돌리라고 안내 |
+| `/start accounts`, "로그인·결제 붙이려고" | GitHub 계정 확인(5-1) + 2~4단계 (Supabase·Google·토스) + 6~7단계 | `/build` 다시 돌리라고 안내 |
 | `/start` 만 치고 범위를 말하지 않음 | 아래 0단계 질문으로 고르게 한다 | 고른 범위대로 |
 | "전부", "다 준비할래" | 0~7단계 전체 | `/plan` 안내 |
 
@@ -86,9 +86,11 @@ git --version
 - `git`이 없으면 macOS는 `xcode-select --install`, Windows는 [git-scm.com](https://git-scm.com).
 - 설치 후 **터미널을 껐다 켜야 인식된다.** 이 말을 반드시 해준다. 여기서 가장 많이 막힌다.
 
-GitHub 계정이 없으면 먼저 만든다. Vercel 로그인에 쓴다.
-
 ### 2단계. Supabase (데이터베이스와 로그인)
+
+**GitHub 계정부터 확인한다.** Supabase와 Vercel 둘 다 GitHub로 로그인한다.
+`/start deploy` 를 건너뛰고 바로 `/start accounts` 로 온 사람은 계정이 없을 수 있다.
+없다고 하면 5-1(계정 만들기)만 먼저 하고 돌아온다. gh 설치와 Vercel은 배포 때 하므로 여기서는 하지 않는다.
 
 1. [supabase.com](https://supabase.com) → **Start your project** → GitHub로 로그인
 2. **New project**
@@ -228,7 +230,15 @@ NEXT_PUBLIC_TOSS_CLIENT_KEY=
 TOSS_SECRET_KEY=
 ```
 
-`.gitignore`에 `.env*.local`이 있는지 **반드시 확인한다.** 없으면 추가한다.
+`.gitignore`에 `.env*` 가 있는지 **반드시 확인한다.** 없으면 추가한다.
+(`.env*.local` 만으로는 부족하다. Vercel 토큰 같은 값이 `.env` 에 들어가기도 한다.
+Next.js가 만드는 `.gitignore` 에도 `.env*` 로 들어 있다.)
+정말 무시되는지 명령으로 확인한다. 경로가 출력되면 된 것이다.
+
+```bash
+git check-ignore -v .env.local
+```
+
 사용자에게 왜 중요한지 한 줄로 말해준다. "이게 없으면 비밀 키가 GitHub에 그대로 올라갑니다."
 
 ### 7단계. Supabase MCP 연결

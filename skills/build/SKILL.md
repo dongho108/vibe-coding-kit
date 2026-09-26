@@ -33,6 +33,7 @@ description: >
 로컬 모드에서 하는 것은 **1단계(Next.js 프로젝트)** 와 **임시 데이터**뿐이다.
 
 1. `npx create-next-app@latest . --typescript --tailwind --app --eslint`
+   이어서 1단계의 **커밋 검사기**도 깐다.
 2. 기획서의 "저장할 것들"을 읽고 프리셋에 맞는 임시 데이터 파일을 만든다.
    - 단건: `data/products.ts` (상품 2~3개. 이름·가격·설명·사진)
    - 구독: `data/plans.ts`
@@ -127,6 +128,18 @@ npx create-next-app@latest . --typescript --tailwind --app --eslint
 ```
 
 이미 폴더에 `.env.local` 이 있으면 덮어쓰지 않게 주의한다. `/start` 에서 만든 것이다.
+
+프로젝트가 생기면 바로 **커밋 검사기**를 깐다. 비밀 키나 `.env` 파일이 커밋에 섞이면 커밋을 막는다.
+Claude가 커밋하든 사용자가 직접 하든 항상 걸린다.
+
+```bash
+git rev-parse --git-dir >/dev/null 2>&1 || git init
+cp "${CLAUDE_PLUGIN_ROOT}/skills/build/resources/pre-commit" "$(git rev-parse --git-dir)/hooks/pre-commit"
+chmod +x "$(git rev-parse --git-dir)/hooks/pre-commit"
+```
+
+사용자에게 한 줄로 말해준다. "비밀 키가 실수로 GitHub에 올라가지 않게 커밋 검사기를 달아뒀어요."
+검사기에 걸리면 **`--no-verify` 로 건너뛰지 마라.** 키를 `.env.local` 로 옮기고 다시 커밋한다.
 
 프로젝트가 생기면 `nextjs-best-practices` 를 읽고 폴더 구조와 컴포넌트 경계를 그 원칙대로 잡는다. 파일을 실제로 만들 때는 `nextjs-developer` 의 App Router 패턴을 따른다. 로컬 모드에서도 같다.
 
