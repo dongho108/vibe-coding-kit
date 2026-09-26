@@ -34,10 +34,12 @@ description: >
 
 1. `npx create-next-app@latest . --typescript --tailwind --app --eslint`
 2. 기획서의 "저장할 것들"을 읽고 프리셋에 맞는 임시 데이터 파일을 만든다.
-   - 단건: `data/products.ts` (상품 2~3개. 이름·가격·설명·이미지 자리)
+   - 단건: `data/products.ts` (상품 2~3개. 이름·가격·설명·사진)
    - 구독: `data/plans.ts`
-   - 예약: `data/slots.ts`
+   - 예약: `data/slots.ts` (클래스·공간 사진이 있으면 같이)
    화면은 이 파일을 import해서 쓴다. 데이터베이스는 아직 없다고 사용자에게 한 줄로 말해준다.
+   **사진은 비워두지 말고 아래 "임시 사진 넣기"대로 고화질 사진을 받아 넣는다.**
+   회색 빈 칸만 있는 화면으로는 디자인이 어떤지 판단할 수 없다.
 3. `npm run dev` 로 첫 페이지가 뜨는 것까지 확인한다.
 
 Supabase 연결·스키마·로그인(2~4단계)은 하지 않는다. 계정을 만들라고 하지도 않는다.
@@ -48,10 +50,47 @@ Supabase 연결·스키마·로그인(2~4단계)은 하지 않는다. 계정을 
 다음은 화면을 만들 차례예요. /design 이라고 쳐주세요.
 ```
 
+### 임시 사진 넣기
+
+상품 하나에 사진 2장씩 넣는다. (기본 디자인의 상품 카드는 마우스를 올리면 두 번째 사진으로 바뀐다)
+
+**출처는 Unsplash의 무료 사진만 쓴다.** 상업적으로 써도 되고 출처 표기도 필요 없다.
+구글 이미지 검색 결과나 다른 쇼핑몰의 상품 사진은 저작권이 있으니 절대 쓰지 않는다.
+Unsplash+ (유료) 사진이 섞이지 않게 검색 주소에 `?license=free` 를 붙인다.
+
+1. 상품마다 영어 검색어를 정한다. 상품 자체가 보이는 단순한 사진이 좋다.
+   ("핸드메이드 머그컵" → `ceramic mug`, "요가 클래스" → `yoga class studio`)
+2. **WebFetch** 로 `https://unsplash.com/s/photos/<검색어>?license=free` 를 열어
+   `https://images.unsplash.com/photo-...` 로 시작하는 사진 주소와 설명(alt)을 받는다.
+   unsplash.com 페이지는 curl과 `agent-browser` 로는 봇 차단에 막힌다. WebFetch로 연다.
+3. 정사각형 1600px로 잘라 받는다. `images.unsplash.com` 은 curl로 바로 받아진다.
+
+   ```bash
+   mkdir -p public/images/products
+   curl -fL -o public/images/products/<상품-slug>-1.jpg \
+     "https://images.unsplash.com/photo-XXXX?w=1600&h=1600&fit=crop&q=80&fm=jpg"
+   ```
+
+4. 받은 사진을 **Read로 열어 직접 눈으로 본다.** 상품과 맞는지, 글자·워터마크·사람 얼굴이 크게 없는지,
+   상품이 가운데 잘 잘렸는지 확인하고, 아니면 다른 사진으로 바꾼다.
+   한 상품의 사진 2장은 같은 물건처럼 보이면 가장 좋다. 안 되면 같은 색감으로 맞춘다.
+5. 데이터 파일에는 `images: ["/images/products/<상품-slug>-1.jpg", ...]` 처럼 로컬 경로로 넣는다.
+   다른 사이트 주소로 걸지 않으니 `next.config` 설정이 필요 없고, 사진이 사라질 일도 없다.
+6. `data/image-sources.md` 에 파일 이름과 Unsplash 원본 주소를 한 줄씩 적어둔다. (`public/` 에 두면 인터넷에 그대로 공개되니 피한다)
+
+인터넷이 안 되거나 맞는 사진을 못 찾으면 그 상품만 빈 칸으로 두고 사용자에게 말한다.
+
+끝나면 이렇게 한 줄 덧붙인다.
+
+```
+상품 사진은 무료 사진으로 임시로 넣어뒀어요. 실제로 팔 때는 직접 찍은 사진으로 바꿔주세요.
+```
+
 ### 로컬 모드에서 전체 모드로 이어서 돌릴 때
 
 Next.js 프로젝트가 이미 있고 `.env.local` 에 Supabase 값이 채워져 있으면 1단계는 건너뛰고 2단계부터 간다.
-3단계 스키마를 만든 뒤 `data/*.ts` 의 임시 데이터를 seed 마이그레이션으로 옮기고,
+3단계 스키마를 만든 뒤 `data/*.ts` 의 임시 데이터를 seed 마이그레이션으로 옮기고
+(사진은 `public/images/` 에 그대로 두고 경로만 `images` 컬럼에 넣는다),
 화면의 import를 Supabase 조회로 바꾼다. 임시 파일은 옮긴 뒤 지운다.
 
 ## 쓸 외부 스킬
@@ -117,7 +156,7 @@ middleware.ts              세션 갱신
 **`단건`**
 ```
 profiles     id(auth.users 참조), email, name, created_at
-products     id, name, description, price, active
+products     id, name, description, price, images(text[]), active
 orders       id, user_id, product_id, amount, status, toss_payment_key, toss_order_id, created_at
 ```
 
