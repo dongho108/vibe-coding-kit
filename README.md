@@ -20,6 +20,12 @@ curl -fsSL https://raw.githubusercontent.com/dongho108/vibe-coding-kit/main/inst
 
 설치가 끝나면 Code 탭(또는 클로드 코드)을 열고 `/start` 라고 치세요.
 
+**새 버전 자동으로 받기**: `/plugin` > Marketplaces 탭 > `vibe-coding-kit` > **Enable auto-update**.
+켜지 않으면 `/plugin` > Installed 탭 > **Update now** 로 직접 받습니다.
+
+> 관리자용: main에 푸시만 해서는 사용자에게 가지 않습니다.
+> GitHub Actions의 **Release** 워크플로를 직접 돌려야 버전이 올라가고 사용자에게 나갑니다.
+
 ## 순서
 
 계정부터 만들면 지칩니다. **내 컴퓨터에서 먼저 돌려보고, 배포할 때 계정을 만드는 순서**를 권합니다.

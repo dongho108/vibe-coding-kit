@@ -1,0 +1,74 @@
+# 플러그인 새 버전 내보내기.
+# main에 푸시만 해서는 사용자에게 가지 않는다. 이 워크플로를 직접 돌려야 나간다.
+#   1. plugin.json 의 version 을 올려 커밋하고 v<버전> 태그를 붙인다
+#   2. marketplace.json 의 플러그인 출처를 그 태그로 고정한다
+# 사용자는 태그 시점의 코드만 받는다. 새로 설치하는 사람도 마찬가지다.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "올릴 자리 (patch 0.1.0→0.1.1, minor 0.1.0→0.2.0, major 0.1.0→1.0.0)"
+        type: choice
+        options: [patch, minor, major]
+        default: minor
+
+permissions:
+  contents: write
+
+concurrency: release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: 다음 버전 계산
+        id: ver
+        run: |
+          cur=$(jq -r .version .claude-plugin/plugin.json)
+          IFS=. read -r ma mi pa <<< "$cur"
+          case "${{ inputs.bump }}" in
+            major) next="$((ma+1)).0.0" ;;
+            minor) next="$ma.$((mi+1)).0" ;;
+            patch) next="$ma.$mi.$((pa+1))" ;;
+          esac
+          if git rev-parse -q --verify "refs/tags/v$next" >/dev/null; then
+            echo "태그 v$next 가 이미 있습니다." >&2; exit 1
+          fi
+          echo "cur=$cur" >> "$GITHUB_OUTPUT"
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+
+      - name: 버전 올리고 태그
+        env:
+          NEXT: ${{ steps.ver.outputs.next }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          jq --arg v "$NEXT" '.version = $v' .claude-plugin/plugin.json > tmp.json
+          mv tmp.json .claude-plugin/plugin.json
+          git commit -am "release: v$NEXT"
+          git tag "v$NEXT"
+
+      - name: 마켓플레이스를 새 태그로 고정
+        env:
+          NEXT: ${{ steps.ver.outputs.next }}
+          REPO: ${{ github.repository }}
+        run: |
+          jq --arg repo "$REPO" --arg ref "v$NEXT" \
+            '.plugins[0].source = {source: "github", repo: $repo, ref: $ref}' \
+            .claude-plugin/marketplace.json > tmp.json
+          mv tmp.json .claude-plugin/marketplace.json
+          git commit -am "marketplace: v$NEXT 로 고정"
+
+      - name: 푸시
+        env:
+          NEXT: ${{ steps.ver.outputs.next }}
+        run: |
+          git push origin main "v$NEXT"
+          echo "### v${{ steps.ver.outputs.cur }} → v$NEXT 배포" >> "$GITHUB_STEP_SUMMARY"
