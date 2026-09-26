@@ -6,11 +6,19 @@
 
 ## 설치
 
+**Claude 데스크탑 앱**: 설정 > 플러그인 > 오른쪽 위 "+ 추가" > "마켓플레이스 추가" 에 아래 주소를 넣고, 검색창에 `vibe` 를 쳐서 나오는 카드의 + 를 누르세요.
+
+```
+https://github.com/dongho108/vibe-coding-kit
+```
+
+**터미널(Claude Code CLI)**:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/dongho108/vibe-coding-kit/main/install.sh | bash
 ```
 
-설치가 끝나면 클로드 코드를 열고 `/start` 이라고 치세요.
+설치가 끝나면 Code 탭(또는 클로드 코드)을 열고 `/start` 라고 치세요.
 
 ## 순서
 
