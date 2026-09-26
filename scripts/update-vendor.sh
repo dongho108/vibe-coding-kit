@@ -16,6 +16,7 @@ clone nextlevelbuilder/ui-ux-pro-max-skill uiux
 clone vercel-labs/agent-browser agentbrowser
 clone jeffallan/claude-skills jeffallan
 clone sickn33/agentic-awesome-skills awesome
+clone yournextstore/yournextstore yns
 git clone --depth 1 --filter=blob:none --sparse -q https://github.com/vercel/next.js.git "$TMP/next"
 git -C "$TMP/next" sparse-checkout set skills
 echo "next $(git -C "$TMP/next" rev-parse --short HEAD)"
@@ -43,6 +44,22 @@ done
 cp "$TMP/supabase/LICENSE" "$R/licenses/supabase-agent-skills.LICENSE"
 cp "$TMP/next/license.md" "$R/licenses/nextjs.LICENSE"
 cp "$TMP/anthropic/skills/frontend-design/LICENSE.txt" "$R/licenses/anthropics-skills.LICENSE"
+# /design 기본 디자인 원본 (VENDOR.md 참조)
+YNS_FILES=(
+  components.json app/globals.css app/layout.tsx app/page.tsx app/navbar.tsx app/footer.tsx
+  app/cart-button.tsx app/cart/cart-sidebar.tsx app/cart/cart-item.tsx
+  "app/product/[slug]/page.tsx" "app/product/[slug]/media-gallery.tsx"
+  "app/product/[slug]/add-to-cart-button.tsx" "app/product/[slug]/quantity-selector.tsx"
+  components/product-card.tsx components/sections/hero.tsx components/sections/about.tsx
+  components/sections/newsletter.tsx components/sections/product-grid.tsx
+)
+rm -rf "$R/skills/design/references/yns"
+for f in "${YNS_FILES[@]}"; do
+  mkdir -p "$R/skills/design/references/yns/$(dirname "$f")"
+  cp "$TMP/yns/$f" "$R/skills/design/references/yns/$f"
+done
+cp "$TMP/yns/LICENSE.md" "$R/licenses/yournextstore.LICENSE"
+
 cp "$TMP/uiux/LICENSE" "$R/licenses/ui-ux-pro-max.LICENSE"
 cp "$TMP/agentbrowser/LICENSE" "$R/licenses/agent-browser.LICENSE"
 cp "$TMP/jeffallan/LICENSE" "$R/licenses/jeffallan-claude-skills.LICENSE"

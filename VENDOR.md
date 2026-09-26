@@ -27,12 +27,21 @@
 | nextjs-developer | jeffallan/claude-skills | MIT | 882ef55 |
 | nextjs-best-practices | sickn33/agentic-awesome-skills | MIT (코드) / CC BY 4.0 (문서) | 2fd5ecf |
 | nextjs-supabase-auth | sickn33/agentic-awesome-skills (원출처 vibeship-spawner-skills, Apache-2.0) | MIT (코드) / CC BY 4.0 (문서) | 2fd5ecf |
+| design/references/yns (화면 코드 일부) | yournextstore/yournextstore | MIT | edc036b |
 
 원본 라이선스 전문은 `licenses/` 에 있다. `sickn33/agentic-awesome-skills` 는 코드 MIT, 문서 콘텐츠 CC BY 4.0 이중 라이선스라 둘 다 담았다. `nextjs-supabase-auth` 의 SKILL.md 프론트매터에 원출처(vibeship-spawner-skills, Apache 2.0)가 적혀 있어 그대로 둔다.
 `vercel-labs/agent-skills` 만 루트에 LICENSE 파일이 없고 README의 License 절에 MIT로 선언한다.
 `licenses/vercel-agent-skills.LICENSE` 에 그 사실을 적어뒀다.
 
 ## 알아둘 것
+
+### design/references/yns 는 스킬이 아니라 참고 코드다
+
+`/design` 의 기본 디자인 원본이다. 2026-09-26에 추가했다.
+Your Next Store 저장소에서 화면 모양을 담은 파일 18개만 골라 원본 그대로 담았다. 목록은 `scripts/update-vendor.sh` 의 `YNS_FILES`.
+앱으로 실행되지 않고, `/design` 이 사용자 프로젝트에 옮겨 쓸 때 읽기만 한다.
+원본이 쓰는 `commerce-kit`·Stripe 연결을 우리 데이터로 바꾸는 법은 `skills/design/references/yns-style.md` 에 있다.
+갱신한 뒤에는 `yns-style.md` 에 적힌 파일 이름과 클래스가 아직 맞는지 확인한다.
 
 ### agent-browser 는 얇은 스텁이다
 
