@@ -4,7 +4,7 @@ set -euo pipefail
 REPO="dongho108/vibe-coding-kit"
 
 echo "바이브 코딩 키트를 설치합니다."
-claude plugin marketplace add "$REPO"
+claude plugin marketplace add "https://github.com/$REPO.git"
 claude plugin install vibe-coding-kit@vibe-coding-kit -y
 
 echo

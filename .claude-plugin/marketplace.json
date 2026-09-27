@@ -8,8 +8,8 @@
     {
       "name": "vibe-coding-kit",
       "source": {
-        "source": "github",
-        "repo": "dongho108/vibe-coding-kit",
+        "source": "url",
+        "url": "https://github.com/dongho108/vibe-coding-kit.git",
         "ref": "v0.2.0"
       },
       "description": "아이디어부터 결제되는 서비스까지. 기술 선택을 대신 내려주는 올인원 키트"

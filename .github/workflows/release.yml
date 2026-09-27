@@ -60,8 +60,9 @@ jobs:
           NEXT: ${{ steps.ver.outputs.next }}
           REPO: ${{ github.repository }}
         run: |
-          jq --arg repo "$REPO" --arg ref "v$NEXT" \
-            '.plugins[0].source = {source: "github", repo: $repo, ref: $ref}' \
+          # github 형식은 SSH를 먼저 시도해 열쇠가 없는 컴퓨터에서 실패한다. https 주소로 적는다.
+          jq --arg url "https://github.com/$REPO.git" --arg ref "v$NEXT" \
+            '.plugins[0].source = {source: "url", url: $url, ref: $ref}' \
             .claude-plugin/marketplace.json > tmp.json
           mv tmp.json .claude-plugin/marketplace.json
           git commit -am "marketplace: v$NEXT 로 고정"
