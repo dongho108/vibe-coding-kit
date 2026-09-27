@@ -50,6 +50,10 @@ curl -fsSL https://raw.githubusercontent.com/dongho108/vibe-coding-kit/main/inst
 /pay             결제
    ↓
 /publish         로그인 주소 재등록, 웹훅, 최종 확인
+   ↓
+/feature         그다음부터는 원하는 기능을 말로 하면 됩니다
+
+/live            진짜 돈을 받고 싶어지면 (사업자등록 필요)
 ```
 
 한 번에 전부 준비하고 싶으면 `/start` 만 치고 "전부"라고 답하면 됩니다.
@@ -83,16 +87,16 @@ curl -fsSL https://raw.githubusercontent.com/dongho108/vibe-coding-kit/main/inst
 구독은 토스페이먼츠 개발자센터에 이메일로 가입하면 내 테스트 키가 나오고, 웹훅까지 동작합니다.
 결제 코드는 토스페이먼츠가 AI용으로 낸 [LLM Quick Reference](https://docs.tosspayments.com/guides/v2/get-started/llms-quick-reference) 규칙대로 만듭니다.
 
-실제로 돈을 받으려면 사업자등록과 통신판매업 신고가 필요합니다.
-이건 결제사와 무관하게 법적으로 요구되는 절차이고, `docs/02-실결제-전환-체크리스트.md` 에 순서대로 적어뒀습니다.
-먼저 만들고 나중에 밟으세요.
+실제로 돈을 받으려면 사업자등록과 토스페이먼츠 전자결제 신청(심사)이 필요합니다.
+준비가 되면 `/live` 라고 치세요. 사업자등록 확인, 심사용 사이트 준비, 라이브 키 교체, 첫 실결제 확인까지 순서대로 안내합니다.
+전체 순서는 `docs/02-실결제-전환-체크리스트.md` 에 있습니다. 먼저 만들고 나중에 밟으세요.
 
 ## 스킬 목록
 
 직접 만든 것과 좋은 외부 스킬을 한 저장소에 모아뒀습니다. 따로 설치할 게 없습니다.
 
 **진행 스킬 (직접 제작)**
-`start` `plan` `build` `design` `publish` `pay`
+`start` `plan` `build` `design` `publish` `pay` `feature` `live`
 
 **지식 스킬 (외부, 출처는 [VENDOR.md](VENDOR.md))**
 `supabase` `supabase-postgres-best-practices` `deploy-to-vercel` `react-best-practices`
