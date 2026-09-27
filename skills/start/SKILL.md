@@ -137,21 +137,36 @@ Google 키는 Supabase 대시보드에 저장되므로 `.env.local`에는 넣지
 
 ### 4단계. 토스페이먼츠 (결제, 테스트 키만)
 
-[developers.tosspayments.com](https://developers.tosspayments.com) 에서 **이메일과 전화번호만으로** 가입한다.
-**사업자등록번호는 필요 없다.** 가입하면 "개발 연동 체험 상점"이 생기고 테스트 키가 나온다.
+**사업자등록 없이 테스트 키로 간다.** 어떤 키를 쓰는지는 기획서의 프리셋에 따라 다르다.
+`docs/기획서.md` 가 아직 없으면 "매달 결제하는 구독 서비스인가요?" 하나만 묻고 고른다.
+(근거: 토스 [API 키 가이드](https://docs.tosspayments.com/reference/using-api/api-keys.md).
+주문서형 결제용 내 키는 사업자등록이 필요한 전자결제 신청 뒤에만 나온다.)
 
-받아올 값 2개:
+**단건·예약 → 가입 없이 문서용 테스트 키**
+
+토스 문서에 공개된 주문서형 결제(옛 이름 결제위젯) 테스트 키를 그대로 넣는다. 가입하지 않아도 된다.
 
 | 값 | 어디에 |
 |---|---|
-| 테스트 클라이언트 키 (`test_gck_...`) | `NEXT_PUBLIC_TOSS_CLIENT_KEY` |
-| 테스트 시크릿 키 (`test_gsk_...`) | `TOSS_SECRET_KEY` |
+| `test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm` | `NEXT_PUBLIC_TOSS_CLIENT_KEY` |
+| `test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6` | `TOSS_SECRET_KEY` |
 
-키가 `test_`로 시작하는지 확인시킨다. 결제위젯은 `gck`/`gsk`, API 개별연동은 `ck`/`sk`다.
-우리는 결제위젯을 쓰므로 **`gck`/`gsk`를 받는다.**
+결제창과 결제 승인까지 테스트된다. 다만 모두가 같이 쓰는 키라서 내 결제 내역이 안 보이고 웹훅을 등록할 수 없다.
+사용자에게 한 줄로 말해준다. "사업자등록하고 토스에 전자결제 신청을 하면 내 키로 두 값만 바꾸면 돼요."
 
-> 가입조차 건너뛰고 싶어 하면 문서용 테스트 키로도 결제창은 뜬다.
-> 다만 웹훅과 API 로그가 없어서 `/publish`에서 다시 해야 한다. 그러니 지금 가입하는 편이 낫다고 말해준다.
+**구독 → 개발자센터 가입 후 내 테스트 키**
+
+[developers.tosspayments.com](https://developers.tosspayments.com) 에서 **이메일만으로** 가입한다. 사업자등록번호는 묻지 않는다.
+가입하면 "개발 연동 체험 상점"이 생긴다. 개발자센터 → API 키 → **API 개별 연동 키** 에서 받는다.
+
+| 값 | 어디에 |
+|---|---|
+| 테스트 클라이언트 키 (`test_ck_...`) | `NEXT_PUBLIC_TOSS_CLIENT_KEY` |
+| 테스트 시크릿 키 (`test_sk_...`) | `TOSS_SECRET_KEY` |
+
+구독의 자동결제(빌링)는 이 `ck`/`sk` 키를 쓴다. 이 키로는 결제 내역과 웹훅까지 내 계정에서 된다.
+
+어느 쪽이든 키가 `test_` 로 시작하는지 확인시킨다. `live_` 는 실제 돈이 나간다.
 
 ### 5단계. GitHub 연결과 Vercel (배포 준비)
 
