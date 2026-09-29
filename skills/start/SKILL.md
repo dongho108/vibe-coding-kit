@@ -3,7 +3,7 @@ name: start
 description: >
   바이브 코딩 키트의 첫 단계. 서비스를 만들기 전에 필요한 개발 환경과 계정을 전부 준비한다.
   node·git 설치 확인, Vercel·Supabase·토스페이먼츠·Google Cloud 계정 생성 안내,
-  API 키 발급, .env.local 작성, Supabase MCP 연결까지 처리한다.
+  API 키 발급, .env.local 작성까지 처리한다.
   "시작", "처음", "setup", "환경 설정", "계정 만들기", "키 받아야 해", "뭐부터 해야 해",
   "개발 환경", "세팅" 같은 말이나, 아무 준비 없이 서비스를 만들려는 모든 요청에 트리거한다.
   코드는 한 줄도 쓰지 않는다. 준비물만 갖춘다.
@@ -14,6 +14,12 @@ description: >
 이 스킬은 **코딩 시작 전 준비물을 갖추는 단계**다. 코드는 쓰지 않는다.
 
 사용자는 터미널을 처음 여는 사람이다. 명령어를 복붙할 줄만 안다고 가정한다.
+
+## 진행 기록
+
+시작할 때 `.claude/worklog/진행상황.md` 를 읽고 (없으면 만들고), **단계 하나를 끝낼 때마다** 고친다.
+형식과 규칙은 `next` 스킬의 "작업 기록 파일" 을 따른다. 이미 "정해진 것" 에 있는 선택은 다시 묻지 않는다.
+범위를 좁혀 돌렸으면 한 범위만 체크한다. 예: `/start local` 이면 "/start local" 한 줄만.
 
 ## 반드시 지킬 것
 
@@ -48,9 +54,9 @@ description: >
 |---|---|---|
 | `/start local`, "지금은 Node만", "계정은 나중에" | 0~1단계 (node·git) | `/plan` 안내. 계정 이야기는 꺼내지 않는다 |
 | `/start deploy`, "배포하려고" | 5단계 (GitHub 계정 + gh 설치·로그인 + Vercel) | `/publish` 안내 |
-| `/start accounts`, "로그인·결제 붙이려고" | GitHub 계정 확인(5-1) + 2~4단계 (Supabase·Google·토스) + 6~7단계 | `/build` 다시 돌리라고 안내 |
+| `/start accounts`, "로그인·결제 붙이려고" | GitHub 계정 확인(5-1) + 2~4단계 (Supabase·Google·토스) + 6단계 | `/build` 다시 돌리라고 안내 |
 | `/start` 만 치고 범위를 말하지 않음 | 아래 0단계 질문으로 고르게 한다 | 고른 범위대로 |
-| "전부", "다 준비할래" | 0~7단계 전체 | `/plan` 안내 |
+| "전부", "다 준비할래" | 0~6단계 전체 | `/plan` 안내 |
 
 범위를 좁혀 돌린 경우 완료 확인도 그 범위만 본다. 로컬만이면 `node --version` 이 20 이상이면 끝이다.
 
@@ -93,12 +99,32 @@ git --version
 없다고 하면 5-1(계정 만들기)만 먼저 하고 돌아온다. gh 설치와 Vercel은 배포 때 하므로 여기서는 하지 않는다.
 
 1. [supabase.com](https://supabase.com) → **Start your project** → GitHub로 로그인
-2. **New project**
-   - Name: 서비스 이름
-   - Database Password: **생성 버튼을 눌러 만들고 반드시 따로 저장하게 한다.** 다시 못 본다.
-   - Region: `Northeast Asia (Seoul)`
-3. 프로젝트 생성에 1~2분 걸린다. 기다리는 동안 다음 설명을 해준다.
-4. 왼쪽 아래 **Project Settings** → **API Keys**
+2. 처음 가입한 사람은 **조직(Organization)** 을 먼저 만들라는 화면이 나온다. 조직은 프로젝트를 담는 폴더라고 한 줄로 설명한다.
+
+   | 칸 | 넣을 값 |
+   |---|---|
+   | Name | 아무거나 (본인 이름이나 서비스 이름) |
+   | Type | `Personal` |
+   | Plan | `Free - $0/month` (카드 등록을 묻지 않는 무료 요금제) |
+
+3. **New project** 화면. 칸마다 아래 값을 그대로 불러준다. 표에 없는 칸은 건드리지 않고 기본값으로 둔다.
+
+   | 칸 | 넣을 값 | 사용자에게 할 말 |
+   |---|---|---|
+   | Organization | 방금 만든 조직 | |
+   | Project name | 서비스 이름 (영어·한글 상관없음) | "나중에 바꿀 수 있어요" |
+   | Database Password | **Generate a password** 를 눌러 자동 생성 → **Copy** | "메모장 같은 데 꼭 따로 저장해두세요. 다시 볼 수 없어요." 지금 앱 코드에는 안 쓰지만 잃어버리면 재설정해야 한다 |
+   | Region | `Northeast Asia (Seoul)` | "한국에서 쓸 거라 서울로 해야 빨라요." **만든 뒤에는 못 바꾼다** |
+   | Compute size (보일 때만) | 기본값 (`Micro` 또는 `Nano`) 그대로 | 무료 요금제에서는 이것만 고를 수 있다 |
+   | Enable Data API (보안 옵션 안) | **켠 채로 둔다** | 끄면 앱이 데이터베이스를 읽지 못한다 |
+   | Automatically expose new tables (보안 옵션 안) | **체크하지 않는다** (기본값) | 새 테이블이 인터넷에 저절로 열리지 않게 하는 안전장치. `/build` 가 테이블마다 필요한 권한만 따로 열어준다 |
+   | Postgres type (보일 때만) | 기본값 `Postgres` | 실험 버전(OrioleDB)은 고르지 않는다 |
+
+   화면이 표와 다르면 (칸 이름이 바뀌었거나 모르는 칸이 있으면) 추측하지 말고 사용자에게 보이는 칸 이름을 물어본 뒤 답한다.
+   원칙은 하나다. **지역만 서울로 바꾸고, 나머지 모르는 칸은 기본값.**
+
+4. 초록색 **Create new project** 를 누른다. 생성에 1~2분 걸린다. 기다리는 동안 다음 설명을 해준다.
+5. 왼쪽 아래 **Project Settings** → **API Keys**
 
 받아올 값 3개:
 
@@ -256,18 +282,6 @@ git check-ignore -v .env.local
 
 사용자에게 왜 중요한지 한 줄로 말해준다. "이게 없으면 비밀 키가 GitHub에 그대로 올라갑니다."
 
-### 7단계. Supabase MCP 연결
-
-클로드가 데이터베이스를 직접 보고 만질 수 있게 연결한다.
-
-```bash
-claude mcp add --scope project --transport http supabase "https://mcp.supabase.com/mcp"
-```
-
-그 다음 터미널에서 `/mcp` 를 치고 supabase를 선택해 **Authenticate**로 로그인한다.
-
-프로젝트를 하나로 제한하고 싶으면 URL 뒤에 `?project_ref=<프로젝트ID>`를 붙인다.
-
 ## 완료 확인
 
 범위를 좁혀 돌렸으면 그 범위만 확인한다. 아래는 전체 모드 기준이다.
@@ -298,6 +312,7 @@ grep -c '=$' .env.local
 | `node: command not found` (설치했는데도) | 터미널을 껐다 켜야 한다 |
 | `gh: command not found` (설치했는데도) | 같은 이유. 껐다 켜기 |
 | `gh auth login` 에서 브라우저가 안 열린다 | 화면의 주소(github.com/login/device)를 직접 열고 코드 입력 |
+| Supabase 지역을 서울 말고 다른 곳으로 만들었다 | 지역은 나중에 못 바꾼다. 아직 데이터가 없으면 프로젝트를 지우고 서울로 새로 만든다 |
 | Supabase에 `anon` 키만 보인다 | 레거시 키다. API Keys에서 새 publishable 키를 발급 |
 | Google에서 OAuth client 생성 버튼이 없다 | OAuth consent screen을 먼저 설정해야 한다 |
 | 구글 로그인 시 `redirect_uri_mismatch` | Google의 Authorized redirect URIs와 Supabase 콜백 URL이 한 글자라도 다르다. 복사해서 붙여넣게 한다 |

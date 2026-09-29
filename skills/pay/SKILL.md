@@ -14,6 +14,11 @@ description: >
 결제 지식은 이 파일이 아니라 **토스페이먼츠 공식 문서**가 기준이다. 이 파일은 순서와 우리 스택에 맞춘 규칙만 담는다.
 이 파일과 공식 문서가 다르면 공식 문서를 따르고, 다르다는 걸 사용자에게 한 줄로 알린다.
 
+## 진행 기록
+
+시작할 때 `.claude/worklog/진행상황.md` 를 읽고 (없으면 만들고), **단계 하나를 끝낼 때마다** 고친다.
+형식과 규칙은 `next` 스킬의 "작업 기록 파일" 을 따른다. 이미 "정해진 것" 에 있는 선택은 다시 묻지 않는다.
+
 ## 0단계. 공식 문서부터 읽는다
 
 코드를 쓰기 전에 반드시 한다. 결제 코드는 기억에 의존해 짜면 없는 필드를 지어내기 쉽다.
@@ -39,6 +44,9 @@ description: >
    ```bash
    claude mcp add --scope project tosspayments-integration-guide -- npx -y @tosspayments/integration-guide-mcp@latest
    ```
+
+   Claude가 직접 실행하고, 사용자에게 화면 조작을 시키지 않는다. 클로드 데스크탑이면 이 서버는 `/mcp` 의 커넥터 화면에 나오지 않을 수 있다.
+   안 잡혀도 1~2번의 curl로 충분하니 연결 때문에 사용자를 붙잡지 않는다. (터미널·데스크탑 차이는 `build` 스킬 "사용 환경" 참고)
 
 **문서에 없는 필드는 만들지 않는다.** Stripe 같은 다른 결제사 이름(`payment_intent` 등)을 흉내 내지 않는다.
 필드가 확실하지 않으면 문서를 다시 찾고, 그래도 없으면 사용자에게 묻는다.
@@ -245,6 +253,16 @@ const res = await fetch("https://api.tosspayments.com/v1/payments/confirm", {
 - 같은 주문을 두 번 승인 → 두 번째가 막히는가
 
 세 번째와 네 번째를 반드시 해본다. 여기가 실제 사고가 나는 자리다.
+
+화면만 보고 판단하지 않는다. 매번 Supabase MCP `execute_sql` (읽기만)로 주문 행을 직접 본다. (MCP가 아직 연결 안 됐으면 `build` 스킬 "Supabase MCP 사용 규칙"의 연결 절차부터)
+
+```sql
+select toss_order_id, amount, status, toss_payment_key, created_at
+from orders order by created_at desc limit 5;
+```
+
+(구독은 `subscriptions`·`payments`, 예약은 `bookings`·`slots` 의 남은 자리까지 본다)
+결제 컬럼을 추가해야 하면 `build` 스킬의 "Supabase MCP 사용 규칙"대로 `apply_migration` 으로 한다.
 
 에러 상황은 [환경 설정 가이드](https://docs.tosspayments.com/guides/v2/get-started/environment.md)의 방법으로 재현할 수 있다.
 `agent-browser` 로 결제창까지 눌러보며 확인할 수 있다.

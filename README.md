@@ -59,6 +59,9 @@ curl -fsSL https://raw.githubusercontent.com/dongho108/vibe-coding-kit/main/inst
 한 번에 전부 준비하고 싶으면 `/start` 만 치고 "전부"라고 답하면 됩니다.
 각 단계가 끝나면 다음에 칠 명령어를 알려줍니다. 외울 건 `/start` 하나뿐입니다.
 
+**중간에 끊겨도 괜찮습니다.** 어디까지 했는지 프로젝트의 `.claude/worklog/진행상황.md` 에 자동으로 적힙니다.
+며칠 뒤에 돌아와도 `/next` 또는 "이어서 해줘" 라고 치면 남은 일부터 이어서 합니다.
+
 ## 정해져 있는 것
 
 | | |
@@ -96,7 +99,7 @@ curl -fsSL https://raw.githubusercontent.com/dongho108/vibe-coding-kit/main/inst
 직접 만든 것과 좋은 외부 스킬을 한 저장소에 모아뒀습니다. 따로 설치할 게 없습니다.
 
 **진행 스킬 (직접 제작)**
-`start` `plan` `build` `design` `publish` `pay` `feature` `live`
+`start` `plan` `build` `design` `publish` `pay` `feature` `live` `next`
 
 **지식 스킬 (외부, 출처는 [VENDOR.md](VENDOR.md))**
 `supabase` `supabase-postgres-best-practices` `deploy-to-vercel` `react-best-practices`
