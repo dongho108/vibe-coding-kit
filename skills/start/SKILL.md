@@ -2,7 +2,7 @@
 name: start
 description: >
   바이브 코딩 키트의 첫 단계. 서비스를 만들기 전에 필요한 개발 환경과 계정을 전부 준비한다.
-  node·git 설치 확인, Vercel·Supabase·토스페이먼츠·Google Cloud 계정 생성 안내,
+  node·git이 없으면 직접 설치, Vercel·Supabase·토스페이먼츠·Google Cloud 계정 생성 안내,
   API 키 발급, .env.local 작성까지 처리한다.
   "시작", "처음", "setup", "환경 설정", "계정 만들기", "키 받아야 해", "뭐부터 해야 해",
   "개발 환경", "세팅" 같은 말이나, 아무 준비 없이 서비스를 만들려는 모든 요청에 트리거한다.
@@ -87,10 +87,59 @@ node --version
 git --version
 ```
 
-- `node`가 없거나 20 미만이면 설치를 안내한다. macOS는 [nodejs.org](https://nodejs.org) 의 LTS 버튼,
-  Windows도 동일. **Homebrew나 nvm을 권하지 마라.** 초보에게는 설치 파일이 가장 확실하다.
-- `git`이 없으면 macOS는 `xcode-select --install`, Windows는 [git-scm.com](https://git-scm.com).
-- 설치 후 **터미널을 껐다 켜야 인식된다.** 이 말을 반드시 해준다. 여기서 가장 많이 막힌다.
+둘 다 있고 `node` 가 20 이상이면 끝. 없으면 **사용자에게 사이트에 가서 받아오라고 하지 말고, 여기서 직접 설치한다.**
+설치 전에 한 줄만 말한다. "node(자바스크립트를 실행하는 프로그램)가 없어서 제가 설치할게요. 1~2분 걸려요."
+**Homebrew·nvm 은 쓰지 않는다.** 관리자 비밀번호를 물어보거나 설정이 꼬여서 초보가 막힌다.
+
+#### node 설치 — Mac
+
+관리자 비밀번호가 필요 없도록 **내 홈 폴더(`~/.node`)** 에 공식 배포본을 그대로 푼다. 아래를 한 번에 실행한다.
+
+```bash
+VER=$(curl -fsSL https://nodejs.org/dist/index.tab | awk -F'\t' 'NR>1 && $10!="-" {print $1; exit}')
+case "$(uname -m)" in x86_64) A=x64;; *) A=arm64;; esac
+curl -fsSL "https://nodejs.org/dist/$VER/node-$VER-darwin-$A.tar.gz" -o /tmp/node.tgz
+rm -rf ~/.node && mkdir -p ~/.node && tar -xzf /tmp/node.tgz -C ~/.node --strip-components=1 && rm /tmp/node.tgz
+grep -q '/.node/bin' ~/.zshrc 2>/dev/null || echo 'export PATH="$HOME/.node/bin:$PATH"' >> ~/.zshrc
+grep -q '/.node/bin' ~/.zprofile 2>/dev/null || echo 'export PATH="$HOME/.node/bin:$PATH"' >> ~/.zprofile
+~/.node/bin/node --version
+```
+
+- 첫 줄이 최신 LTS 버전을 알아낸다 (`index.tab` 의 `lts` 칸이 `-` 가 아닌 첫 줄). 버전을 손으로 적지 않는다.
+- `.zshrc` 와 `.zprofile` 둘 다에 넣는 이유: 터미널은 `.zshrc` 를, 클로드 데스크탑 앱은 로그인 셸(`.zprofile`)을 읽는다.
+- 마지막 줄에서 `v24.x.x` 처럼 버전이 찍히면 설치는 된 것이다. 이 세션에서 바로 쓰려면 이후 명령 앞에 `export PATH="$HOME/.node/bin:$PATH"` 를 붙인다.
+
+#### git 설치 — Mac
+
+```bash
+xcode-select --install
+```
+
+이 명령은 **화면에 설치 창을 띄운다.** 터미널에서는 끝나지 않는다. 사용자에게 "화면에 뜬 창에서 **설치** 를 누르고 기다려주세요. 5~10분 걸려요" 라고 말하고,
+끝났다고 하면 `xcode-select -p` 로 확인한다 (경로가 찍히면 됨). "이미 설치됨" 오류가 나면 이미 있는 것이다.
+
+#### node·git 설치 — Windows
+
+Windows에 기본으로 들어 있는 `winget` 으로 설치한다. 다른 걸 받아올 필요가 없다.
+
+```powershell
+winget install --id OpenJS.NodeJS.LTS -e --accept-source-agreements --accept-package-agreements
+winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements
+```
+
+- 중간에 "이 앱이 디바이스를 변경하도록 허용하시겠어요?" 창이 뜨면 **예** 를 누르라고 미리 말해둔다.
+- `winget` 자체가 없다고 나오면 (오래된 Windows 10) Microsoft Store에서 **앱 설치 관리자** 를 설치하게 한다. 이 경우만 사이트 다운로드로 안내한다: [nodejs.org](https://nodejs.org) LTS, [git-scm.com](https://git-scm.com).
+
+#### 설치 뒤
+
+- **클로드(또는 터미널)를 껐다 켜야 새 프로그램을 인식한다.** 이 말을 반드시 해준다. 여기서 가장 많이 막힌다.
+  껐다 켠 뒤 `node --version`, `git --version` 을 다시 돌려 확인하고 진행상황.md 에 적는다.
+- git 이 처음이면 이름과 이메일을 넣어둔다. 커밋에 찍히는 값이고, 서비스에 보이지는 않는다.
+
+```bash
+git config --global user.name "<이름>"
+git config --global user.email "<이메일>"
+```
 
 ### 2단계. Supabase (데이터베이스와 로그인)
 
@@ -208,10 +257,25 @@ Google 키는 Supabase 대시보드에 저장되므로 `.env.local`에는 넣지
 gh --version
 ```
 
-없으면 설치 파일로 안내한다. Homebrew·winget은 권하지 않는다.
+없으면 1단계의 node 처럼 **여기서 직접 설치한다.** Homebrew는 쓰지 않는다.
 
-- Mac: [cli.github.com](https://cli.github.com) → **Download for Mac** → `.pkg` 실행, 전부 "계속"
-- Windows: [cli.github.com](https://cli.github.com) → **Download for Windows** → `.msi` 실행, 전부 "Next"
+Mac — 관리자 비밀번호 없이 홈 폴더(`~/.node/bin`, 1단계에서 PATH에 넣은 곳)에 넣는다:
+
+```bash
+V=$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest | grep -o '"tag_name": *"v[^"]*"' | grep -o 'v[0-9.]*')
+case "$(uname -m)" in x86_64) A=amd64;; *) A=arm64;; esac
+curl -fsSL "https://github.com/cli/cli/releases/download/$V/gh_${V#v}_macOS_$A.zip" -o /tmp/gh.zip
+mkdir -p ~/.node/bin && unzip -qo /tmp/gh.zip -d /tmp/gh && cp /tmp/gh/gh_*/bin/gh ~/.node/bin/ && rm -rf /tmp/gh /tmp/gh.zip
+~/.node/bin/gh --version
+```
+
+(`~/.node` 가 없는 컴퓨터면 — node를 다른 방법으로 깔아둔 경우 — `mkdir -p ~/.node/bin` 뒤 1단계와 같이 `.zshrc`·`.zprofile` 에 PATH 줄을 넣는다.)
+
+Windows:
+
+```powershell
+winget install --id GitHub.cli -e --accept-source-agreements --accept-package-agreements
+```
 
 **설치 후 클로드(또는 터미널)를 껐다 켜야 인식된다.** node 때와 같은 함정이다.
 
@@ -309,7 +373,9 @@ grep -c '=$' .env.local
 
 | 증상 | 원인과 답 |
 |---|---|
-| `node: command not found` (설치했는데도) | 터미널을 껐다 켜야 한다 |
+| `node: command not found` (설치했는데도) | 터미널을 껐다 켜야 한다. 그래도 안 되면 `cat ~/.zshrc ~/.zprofile` 에 `.node/bin` 줄이 있는지 본다 |
+| Mac에서 `curl` 이 실패한다 | 인터넷·회사 프록시 문제. 와이파이를 바꿔보고, 안 되면 그때만 [nodejs.org](https://nodejs.org) 설치 파일로 안내 |
+| `xcode-select --install` 이 "이미 설치됨" | 이미 있는 것. `git --version` 으로 확인하고 넘어간다 |
 | `gh: command not found` (설치했는데도) | 같은 이유. 껐다 켜기 |
 | `gh auth login` 에서 브라우저가 안 열린다 | 화면의 주소(github.com/login/device)를 직접 열고 코드 입력 |
 | Supabase 지역을 서울 말고 다른 곳으로 만들었다 | 지역은 나중에 못 바꾼다. 아직 데이터가 없으면 프로젝트를 지우고 서울로 새로 만든다 |
