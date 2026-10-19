@@ -5,7 +5,8 @@ description: >
   node·git·gh 직접 설치, Supabase 프로젝트 생성과 키 받기(Supabase MCP), 구글 로그인 설정(브라우저 조작),
   토스페이먼츠 테스트 키, Vercel 로그인, .env.local 작성까지 Claude가 직접 하고 사용자에게는 가입·허용만 시킨다.
   "시작", "처음", "setup", "환경 설정", "계정 만들기", "키 받아야 해", "뭐부터 해야 해",
-  "개발 환경", "세팅" 같은 말이나, 아무 준비 없이 서비스를 만들려는 모든 요청에 트리거한다.
+  "개발 환경", "세팅" 같은 말이나, "쇼핑몰 만들고 싶어"·"서비스 만들어줘" 처럼 아직 프로젝트가 없는 폴더에서
+  서비스를 만들려는 모든 첫 요청에 트리거한다 (진행상황.md 가 없으면 plan·build 보다 이 스킬이 먼저다).
   코드는 한 줄도 쓰지 않는다. 준비물만 갖춘다.
 ---
 
@@ -21,6 +22,7 @@ description: >
 
 시작할 때 `.claude/worklog/진행상황.md` 를 읽고 (없으면 만들고), **단계 하나를 끝낼 때마다** 고친다.
 형식과 규칙은 `next` 스킬의 "작업 기록 파일" 을 따른다. 이미 "정해진 것" 에 있는 선택은 다시 묻지 않는다.
+앞 단계가 빠졌으면 `next` 스킬의 "앞 단계가 빠졌으면 그것부터 한다" 대로 그것부터 Claude가 이어서 한다.
 범위를 좁혀 돌렸으면 한 범위만 체크한다. 예: `/start local` 이면 "/start local" 한 줄만.
 
 ## 반드시 지킬 것
@@ -82,6 +84,27 @@ Supabase MCP가 붙어 있으면 `list_projects` 로 이미 만든 프로젝트�
 
 작업 폴더가 없으면 만들고 `git init`까지 해둔다.
 
+**허용 팝업을 줄인다.** 이 키트가 계속 쓰는 명령마다 "실행할까요?" 창이 뜨면 사용자가 하는 일이 그 버튼 누르기가 된다.
+프로젝트 폴더의 `.claude/settings.json` 에 아래 허용 목록을 넣어둔다. 파일이 이미 있으면 `permissions.allow` 에 없는 줄만 더한다.
+사용자에게 한 줄로 말한다. "자주 쓰는 설치·실행 명령은 매번 묻지 않게 해뒀어요. 지우기·결제 같은 건 계속 물어봐요."
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)", "Bash(npm:*)", "Bash(npx:*)",
+      "Bash(git status:*)", "Bash(git add:*)", "Bash(git commit:*)", "Bash(git push:*)", "Bash(git diff:*)",
+      "Bash(git log:*)", "Bash(git init:*)", "Bash(git config:*)", "Bash(git check-ignore:*)", "Bash(git rev-parse:*)",
+      "Bash(gh auth:*)", "Bash(gh repo create:*)", "Bash(gh api user:*)",
+      "Bash(vercel:*)", "Bash(open:*)", "Bash(pbpaste:*)", "Bash(agent-browser:*)"
+    ]
+  }
+}
+```
+
+지우기(`rm -rf`)·강제 푸시·DB 데이터 변경은 넣지 않는다. 그건 매번 묻는 게 맞다.
+`.claude/settings.json` 은 커밋해도 된다. 비밀 값이 없다.
+
 사용자에게는 오늘 할 일을 한 줄로만 말하고 바로 시작한다. "먼저 개발 도구를 설치할게요. 계정은 나중에 필요할 때 만들어요."
 
 ### 1단계. node와 git
@@ -136,8 +159,17 @@ winget install --id Git.Git -e --accept-source-agreements --accept-package-agree
 
 #### 설치 뒤
 
-- **클로드(또는 터미널)를 껐다 켜야 새 프로그램을 인식한다.** 이 말을 반드시 해준다. 여기서 가장 많이 막힌다.
-  껐다 켠 뒤 `node --version`, `git --version` 을 다시 돌려 확인하고 진행상황.md 에 적는다.
+- **클로드를 껐다 켜라고 하지 않는다.** 사용자는 터미널을 직접 쓰지 않으니 재시작은 헤매게만 만든다.
+  지금 세션에서는 Claude가 명령 앞에 경로를 붙여서 바로 쓴다. 다음 세션부터는 설정 파일 덕에 저절로 잡힌다.
+
+  ```bash
+  export PATH="$HOME/.node/bin:$PATH"                                   # Mac
+  export PATH="/c/Program Files/nodejs:/c/Program Files/Git/cmd:/c/Program Files/GitHub CLI:$PATH"   # Windows
+  ```
+
+  `node --version`, `git --version` 으로 확인하고 진행상황.md 에 적는다.
+  경로를 붙여도 안 잡힐 때만 재시작을 부탁하고, 이때는 반드시 다음에 칠 말까지 알려준다.
+  "클로드를 껐다 켠 뒤 이 폴더를 다시 열고 '이어서 해줘' 라고 쳐주세요. 하던 데서 이어서 할게요." (진행상황.md 를 먼저 갱신한다)
 - git 이름·이메일이 비어 있으면 **묻지 않고** 임시로 넣어둔다. 커밋에 찍히는 값이고 서비스에 보이지 않는다.
   GitHub에 로그인한 뒤(5-3) GitHub 계정 값으로 바꾼다.
 
@@ -156,15 +188,17 @@ git config --global user.email >/dev/null || git config --global user.email "$(w
 
 Supabase와 Vercel은 GitHub로 로그인한다. GitHub 계정이 없으면 5-1(가입)만 먼저 하고 온다.
 
-Supabase 가입 페이지를 열어준다. `open "https://supabase.com/dashboard/sign-in"`
+**가입도 Claude의 브라우저에서 한다** (클로드 데스크탑은 내장 브라우저, 터미널은 `agent-browser --headed`).
+3단계 구글 로그인 설정도 같은 브라우저에서 하므로, 여기서 로그인해두면 다시 로그인할 일이 없다.
+브라우저 조작이 안 되는 환경일 때만 외부 브라우저로 연다. `open "https://supabase.com/dashboard/sign-in"`
 
 ```
-열린 페이지에서 [Continue with GitHub] 로 로그인해주세요.
-조직(Organization)을 만들라고 나오면 이름은 아무거나, Type은 Personal, Plan은 Free 로 만들어주세요.
-대시보드가 보이면 "했어" 라고 해주세요. 프로젝트는 제가 만들게요.
+Supabase 가입 화면을 열었어요. [Continue with GitHub] 로 로그인만 해주세요. 나머지는 제가 할게요.
 ```
 
-브라우저 조작이 되는 환경이면 조직 만들기도 Claude가 채운다. 사용자는 GitHub 로그인만 한다.
+조직(Organization)을 만들라는 화면이 나오면 Claude가 채운다. 이름은 서비스 이름, Type `Personal`, Plan `Free`.
+외부 브라우저로 연 경우에만 이 값을 사용자에게 불러주고, 대시보드가 보이면 "했어" 라고 하게 한다.
+MCP 연결(2-2)에서 Supabase 허용 화면이 외부 브라우저로 뜨면 거기서는 한 번 더 로그인해야 할 수 있다. 미리 한 줄 말해준다.
 
 #### 2-2. Supabase MCP 연결
 
@@ -214,9 +248,9 @@ Secret key 가 하나도 없으면 같은 페이지의 **New secret key** 로 �
 
 ### 3단계. Google Cloud (구글 로그인)
 
-**Claude가 브라우저를 조작해서 한다.** 사용자는 그 브라우저에서 Google·Supabase에 로그인만 한다.
+**Claude가 브라우저를 조작해서 한다.** 2-1에서 Supabase 가입을 한 그 브라우저를 쓴다. 사용자는 Google 로그인만 한다.
 (클로드 데스크탑은 앱의 내장 브라우저, 터미널은 `agent-browser --headed`. `next` 스킬 "할 일을 처리하는 순서" 2번)
-사용자에게 미리 한 줄 말한다. "구글 로그인 설정은 제가 브라우저로 할게요. 로그인 화면이 나오면 로그인만 해주세요."
+사용자에게 미리 한 줄 말한다. "구글 로그인 설정은 제가 브라우저로 할게요. 구글 로그인 화면이 나오면 로그인만 해주세요."
 
 콜백 주소는 정해져 있어서 따로 복사하지 않는다. `https://<프로젝트ID>.supabase.co/auth/v1/callback`
 
@@ -307,7 +341,7 @@ Windows:
 winget install --id GitHub.cli -e --accept-source-agreements --accept-package-agreements
 ```
 
-**설치 후 클로드(또는 터미널)를 껐다 켜야 인식된다.** node 때와 같은 함정이다.
+설치 뒤 재시작은 시키지 않는다. 1단계 "설치 뒤" 처럼 경로를 붙여서 바로 쓴다.
 
 #### 5-3. gh 로그인
 
@@ -426,10 +460,10 @@ grep -c '=$' .env.local
 
 | 증상 | 원인과 답 |
 |---|---|
-| `node: command not found` (설치했는데도) | 터미널을 껐다 켜야 한다. 그래도 안 되면 `cat ~/.zshrc ~/.zprofile` 에 `.node/bin` 줄이 있는지 본다 |
+| `node: command not found` (설치했는데도) | 지금 세션은 PATH를 모른다. 1단계 "설치 뒤" 의 `export PATH=...` 를 붙인다. 다음 세션에서도 안 되면 `cat ~/.zshrc ~/.zprofile` 에 `.node/bin` 줄이 있는지 본다 |
 | Mac에서 `curl` 이 실패한다 | 인터넷·회사 프록시 문제. 와이파이를 바꿔보고, 안 되면 그때만 [nodejs.org](https://nodejs.org) 설치 파일로 안내 |
 | `xcode-select --install` 이 "이미 설치됨" | 이미 있는 것. `git --version` 으로 확인하고 넘어간다 |
-| `gh: command not found` (설치했는데도) | 같은 이유. 껐다 켜기 |
+| `gh: command not found` (설치했는데도) | 같은 이유. `export PATH=...` 를 붙인다 |
 | `gh auth login` 에서 브라우저가 안 열린다 | Claude가 `open https://github.com/login/device` 로 연다. 코드는 클립보드에 있다 |
 | `vercel: command not found` (설치했는데도) | `export PATH="$HOME/.node/bin:$PATH"` 를 붙여 다시 돌린다 |
 | Supabase MCP `create_project` 가 없다 | 터미널에서 `project_ref` 를 붙여 연결해서다. 2-2대로 `project_ref` 없이 다시 연결한다 |
