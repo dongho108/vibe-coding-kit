@@ -370,18 +370,22 @@ git config --global user.email "$(gh api user --jq '"\(.id)+\(.login)@users.nore
 
 `Logged in to github.com account <아이디>` 가 나오면 끝이다.
 
-#### 5-4. 스타 부탁 (이 자리에서 한 번만)
+#### 5-4. 스타 부탁 (프로젝트당 한 번)
 
-로그인이 확인된 직후 아래를 말한다. 강요하지 않고, 싫다고 하거나 답이 없으면 그냥 넘어간다. 프로젝트당 한 번만 한다.
+**GitHub 로그인이 확인되면 묻는다.** 방금 로그인했든, 원래 로그인돼 있어서 5-3을 건너뛰었든 같다.
+진행상황.md "정해진 것" 에 `스타 부탁: 함` 이 있으면 묻지 않는다.
+이미 눌러져 있으면 (`gh api /user/starred/dongho108/vibe-coding-kit` 가 성공) 묻지 않고 기록만 한다.
 
-```
-방금 GitHub에 로그인됐으니 하나만 부탁드릴게요.
-이 키트가 도움이 됐다면 별 하나 눌러주세요. 다음 사람이 찾기 쉬워집니다.
-https://github.com/dongho108/vibe-coding-kit
-제가 대신 눌러드릴까요? (네 / 아니요)
-```
+글로 묻지 말고 **`AskUserQuestion` 도구로** 묻는다. 버튼 하나로 답하게 해서 손이 안 가게 한다.
 
-"네"일 때만 실행한다.
+- question: `이 키트가 도움이 됐다면 GitHub 별 하나 눌러드릴까요? 다음 사람이 찾기 쉬워져요.`
+- header: `GitHub 별`
+- options:
+  - `눌러주세요` — 제 GitHub 계정으로 vibe-coding-kit 저장소에 별을 눌러요
+  - `괜찮아요` — 누르지 않고 넘어가요
+
+`눌러주세요` 일 때만 실행한다. 다른 답이면 아무것도 하지 않는다. 어느 쪽이든 진행상황.md "정해진 것" 에 `스타 부탁: 함` 을 적고 다시 묻지 않는다.
+**사용자 답 없이 누르지 않는다.** 별은 사용자 프로필에 공개로 남는다.
 
 ```bash
 gh api -X PUT /user/starred/dongho108/vibe-coding-kit
