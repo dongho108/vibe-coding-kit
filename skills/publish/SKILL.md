@@ -33,7 +33,7 @@ description: >
 
 1. **먼저 배포하고 결제를 붙인다.** 순서를 바꾸지 마라.
    웹훅은 공개 URL이 있어야 등록된다.
-2. **`.env.local` 을 그대로 올리지 않는다.** Vercel 대시보드나 CLI로 환경변수를 넣는다.
+2. **`.env.local` 을 그대로 올리지 않는다.** 환경변수는 Claude가 `vercel` CLI로 넣는다. 사용자에게 대시보드에서 넣게 하지 않는다.
 3. **테스트 키로 끝까지 확인한 다음에 실결제 이야기를 꺼낸다.**
    순서를 앞당기면 사용자가 여기서 멈춘다.
 
@@ -52,7 +52,8 @@ description: >
 
 ### 1단계. 배포
 
-GitHub에 올리고 Vercel에 연결한다. `/start deploy` 에서 gh 로그인이 끝나 있어야 한다. 안 돼 있으면 거기로 돌려보낸다.
+GitHub에 올리고 Vercel에 연결한다. 사용자에게 시키는 일은 없다.
+gh·vercel 로그인이 안 돼 있으면 (`gh auth status`, `vercel whoami`) `start` 스킬의 5단계를 그 자리에서 하고 돌아온다. 다른 명령으로 보내지 않는다.
 
 커밋하기 전에 비밀 키가 섞이지 않았는지 확인한다.
 
@@ -84,19 +85,30 @@ gh repo create <폴더이름> --private --source=. --remote=origin --push
 | `TOSS_SECRET_KEY` | 토스페이먼츠 개발자센터 → API 키 |
 | Vercel 토큰 | Vercel → Account Settings → Tokens |
 
-Vercel에서 **Add New → Project** → 저장소 선택 → Import.
+Vercel 프로젝트도 Claude가 CLI로 만들고 GitHub 저장소에 연결한다. 이후 푸시할 때마다 자동 배포된다.
 
-첫 배포는 환경변수가 없어서 실패할 수 있다. 정상이다. 다음 단계에서 채운다.
+```bash
+vercel link --yes
+vercel git connect --yes
+```
+
+`link` 단계에서 저장소가 이미 연결됐다고 나오면 `git connect` 는 건너뛴다. `git connect` 가 GitHub 권한 때문에 실패하면, 그때만 Vercel의 GitHub 권한 페이지를 열어 이 저장소를 허용하게 한다.
+환경변수는 다음 단계에서 넣고 배포한다.
 
 ### 2단계. 환경변수
 
-`.env.local` 의 값을 Vercel에 옮긴다. Production·Preview·Development 전부에 넣는다.
+`.env.local` 의 값을 Claude가 Vercel에 옮긴다. Production·Preview·Development 전부에 넣는다.
+값을 화면에 찍지 않도록 파일에서 바로 넘긴다.
 
 ```bash
-vercel env add NEXT_PUBLIC_SUPABASE_URL production
+grep -E '^[A-Z_]+=.' .env.local | while IFS='=' read -r K V; do
+  for E in production development preview; do   # preview 에서 브랜치를 물으며 멈추는 버전이면 preview 는 빼도 된다
+    vercel env rm "$K" "$E" --yes >/dev/null 2>&1
+    printf '%s' "$V" | vercel env add "$K" "$E" >/dev/null && echo "$K → $E"
+  done
+done
+vercel --prod
 ```
-
-또는 대시보드의 **Settings → Environment Variables**.
 
 **`NEXT_PUBLIC_` 이 안 붙은 값이 제대로 서버 전용인지 다시 본다.**
 특히 `SUPABASE_SECRET_KEY` 와 `TOSS_SECRET_KEY`.
@@ -118,11 +130,14 @@ Vercel이 준 `*.vercel.app` 주소로 계속 가도 된다. 사용자에게 먼
 
 **로컬에서 되던 로그인이 배포하면 깨진다.** 주소가 바뀌었기 때문이다. 두 곳을 고친다.
 
-1. **Supabase** → Authentication → URL Configuration
+1. **Supabase** → Authentication → URL Configuration (`https://supabase.com/dashboard/project/<프로젝트ID>/auth/url-configuration`)
    - Site URL: 배포된 주소
-   - Redirect URLs: 배포된 주소 + `/**`
-2. **Google Cloud** → Credentials → OAuth client
+   - Redirect URLs: 배포된 주소 + `/**` (로컬 `http://localhost:3000/**` 도 남겨둔다)
+2. **Google Cloud** → Clients → OAuth client
    - Authorized redirect URIs에 Supabase 콜백 URL이 있는지 확인 (이건 안 바뀐다)
+
+MCP로는 이 설정을 못 바꾼다. Claude가 브라우저를 조작해서 넣는다 (`next` 스킬 "할 일을 처리하는 순서" 2번).
+브라우저 조작이 안 되면 그 페이지를 열어주고 넣을 값 두 줄만 불러준다.
 
 배포된 사이트에서 실제로 로그인해본다.
 
@@ -132,7 +147,7 @@ Vercel이 준 `*.vercel.app` 주소로 계속 가도 된다. 사용자에게 먼
 
 붙인 뒤 **웹훅을 등록한다.** 이제 공개 URL이 있으니 가능하다.
 
-토스 개발자센터 → 웹훅 → 배포된 주소의 웹훅 라우트를 등록한다.
+토스 개발자센터 → 웹훅 → 배포된 주소의 웹훅 라우트를 등록한다. 이것도 브라우저 조작으로 Claude가 한다.
 `PAYMENT_STATUS_CHANGED`, `CANCEL_STATUS_CHANGED` 를 받는다. 가상계좌를 쓰면 `DEPOSIT_CALLBACK` 도.
 
 **문서용 테스트 키(`test_gck_docs_...`)를 쓰는 중이면 건너뛴다.** 내 상점이 아니라 등록할 곳이 없다.
@@ -173,7 +188,7 @@ Vercel이 준 `*.vercel.app` 주소로 계속 가도 된다. 사용자에게 먼
 여기서는 완료 메시지 뒤에 한 줄만 남긴다.
 
 ```
-진짜로 돈을 받고 싶어지면 /live 라고 치세요. 사업자등록부터 라이브 키까지 순서대로 안내해드려요.
+진짜로 돈을 받고 싶어지면 "실제로 돈 받고 싶어" 라고 말해주세요. 사업자등록부터 라이브 키까지 순서대로 안내해드려요.
 ```
 
 ## 자주 막히는 곳
@@ -185,10 +200,12 @@ Vercel이 준 `*.vercel.app` 주소로 계속 가도 된다. 사용자에게 먼
 | 로컬은 되는데 배포하면 500 | 서버 환경변수 누락. Vercel 로그를 본다 |
 | 웹훅이 안 온다 | 등록한 URL이 로컬이거나, 라우트가 POST를 안 받는다. 문서용 테스트 키로는 원래 안 온다 |
 | 빌드가 실패한다 | 타입 에러가 대부분이다. `npm run build` 를 로컬에서 먼저 돌려본다 |
-| `gh repo create` 에서 로그인 오류 | `/start deploy` 로 돌아가 `gh auth login` |
-| Vercel에서 저장소가 안 보인다 | Vercel의 GitHub 권한 화면에서 해당 저장소를 허용한다 |
+| `gh repo create` 에서 로그인 오류 | `start` 스킬 5-3 (gh 로그인)을 그 자리에서 한다 |
+| `vercel git connect` 실패 | Vercel의 GitHub 권한 화면을 열어 해당 저장소를 허용하게 한다 |
 
 ## 다음
 
-이제부터는 원하는 기능을 말로 하면 됩니다. "리뷰 기능 붙여줘", "버튼 색 바꿔줘"처럼요.
+배포만 모드였으면 진행상황.md 의 다음 단계(보통 계정 준비 → 데이터베이스)로 이어간다. `next` 스킬의 "단계가 끝나면 다음 단계로 바로 간다".
+
+전부 끝났으면, 이제부터는 원하는 기능을 말로 하면 됩니다. "리뷰 기능 붙여줘", "버튼 색 바꿔줘"처럼요.
 `/feature` 가 작은 수정은 바로 고치고, 큰 기능은 기획부터 차근차근 진행합니다. 끝나면 검증도 알아서 돌립니다.

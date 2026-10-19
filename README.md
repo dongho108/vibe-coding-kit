@@ -26,41 +26,40 @@ curl -fsSL https://raw.githubusercontent.com/dongho108/vibe-coding-kit/main/inst
 > 관리자용: main에 푸시만 해서는 사용자에게 가지 않습니다.
 > GitHub Actions의 **Release** 워크플로를 직접 돌려야 버전이 올라가고 사용자에게 나갑니다.
 
-## 순서
+## 쓰는 법
 
-계정부터 만들면 지칩니다. **내 컴퓨터에서 먼저 돌려보고, 배포할 때 계정을 만드는 순서**를 권합니다.
+**외울 건 없습니다.** `/start` 라고 한 번 치고, 그다음부터는 Claude가 "이어서 할까요?" 라고 물으면 "네" 라고만 하면 됩니다.
+
+설치·Supabase 프로젝트 만들기·키 받기·구글 로그인 설정·배포는 Claude가 직접 합니다.
+사용자가 하는 건 **가입, 로그인, "허용" 버튼, 복사 버튼** 정도입니다. 필요할 때 그 페이지를 Claude가 열어줍니다.
+비밀 키는 복사 버튼만 누르면 Claude가 클립보드에서 바로 가져갑니다. 대화창에 붙여넣어도 됩니다.
+
+**중간에 끊겨도 괜찮습니다.** 어디까지 했는지 프로젝트의 `.claude/worklog/진행상황.md` 에 자동으로 적힙니다.
+며칠 뒤에 돌아와도 "이어서 해줘" 라고 하면 남은 일부터 이어서 합니다.
+
+<details>
+<summary>Claude가 밟는 순서 (몰라도 됩니다)</summary>
+
+계정부터 만들면 지칩니다. **내 컴퓨터에서 먼저 돌려보고, 배포할 때 계정을 만드는 순서**입니다.
 
 ```
-/start local     Node만 확인. 계정은 아직 안 만듭니다
-   ↓
+/start local     node·git 설치
 /plan            아이디어를 기획서로. 여기서 제품 형태를 고릅니다
-   ↓
 /build local     Next.js 뼈대. 데이터는 임시 파일에
-   ↓
 /design          색·폰트 정하고 화면 만들기 → 내 컴퓨터에서 가게가 보입니다
-   ↓
-/start deploy    GitHub·Vercel 계정
-   ↓
+/start deploy    GitHub·Vercel 로그인
 /publish only    인터넷 주소가 생깁니다
-   ↓
-/start accounts  Supabase·Google·토스 계정
-   ↓
+/start accounts  Supabase 프로젝트·구글 로그인·토스 테스트 키
 /build           데이터베이스와 구글 로그인 붙이기 (임시 데이터를 옮깁니다)
-   ↓
 /pay             결제
-   ↓
 /publish         로그인 주소 재등록, 웹훅, 최종 확인
-   ↓
 /feature         그다음부터는 원하는 기능을 말로 하면 됩니다
-
 /live            진짜 돈을 받고 싶어지면 (사업자등록 필요)
 ```
 
-한 번에 전부 준비하고 싶으면 `/start` 만 치고 "전부"라고 답하면 됩니다.
-각 단계가 끝나면 다음에 칠 명령어를 알려줍니다. 외울 건 `/start` 하나뿐입니다.
+슬래시 명령을 직접 쳐서 원하는 단계로 가도 됩니다.
 
-**중간에 끊겨도 괜찮습니다.** 어디까지 했는지 프로젝트의 `.claude/worklog/진행상황.md` 에 자동으로 적힙니다.
-며칠 뒤에 돌아와도 `/next` 또는 "이어서 해줘" 라고 치면 남은 일부터 이어서 합니다.
+</details>
 
 ## 정해져 있는 것
 
@@ -91,7 +90,7 @@ curl -fsSL https://raw.githubusercontent.com/dongho108/vibe-coding-kit/main/inst
 결제 코드는 토스페이먼츠가 AI용으로 낸 [LLM Quick Reference](https://docs.tosspayments.com/guides/v2/get-started/llms-quick-reference) 규칙대로 만듭니다.
 
 실제로 돈을 받으려면 사업자등록과 토스페이먼츠 전자결제 신청(심사)이 필요합니다.
-준비가 되면 `/live` 라고 치세요. 사업자등록 확인, 심사용 사이트 준비, 라이브 키 교체, 첫 실결제 확인까지 순서대로 안내합니다.
+준비가 되면 "실제로 돈 받고 싶어" 라고 말하세요. 사업자등록 확인, 심사용 사이트 준비, 라이브 키 교체, 첫 실결제 확인까지 순서대로 안내합니다.
 전체 순서는 `docs/02-실결제-전환-체크리스트.md` 에 있습니다. 먼저 만들고 나중에 밟으세요.
 
 ## 스킬 목록

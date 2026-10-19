@@ -39,7 +39,7 @@ description: >
 
 ## 시작 전에
 
-1. `package.json` 과 `app/` 이 있는지 본다. 없으면 이 스킬이 아니다. `/start` 부터 안내한다.
+1. `package.json` 과 `app/` 이 있는지 본다. 없으면 이 스킬이 아니다. 명령어를 안내하지 말고 `next` 스킬로 남은 단계부터 이어서 한다.
 2. `docs/기획서.md` 와 `design-system/*/MASTER.md` 를 읽는다. 지금 서비스가 뭔지, 어떤 모양인지 알고 시작한다.
    데이터와 닿는 요청이면 Supabase MCP의 `list_tables` 로 지금 테이블 구조도 본다. 기억이나 추측으로 컬럼 이름을 쓰지 않는다.
 3. `git status` 가 깨끗한지 본다. 커밋 안 된 변경이 있으면 먼저 사용자에게 묻고 커밋해둔다.

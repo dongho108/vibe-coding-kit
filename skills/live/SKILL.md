@@ -118,14 +118,17 @@ description: >
 2. **Vercel의 Production 환경에만** 넣는다. Preview·Development와 `.env.local` 은 테스트 키로 둔다.
    이렇게 나눠야 개발하다 실수로 실제 결제가 일어나지 않는다.
 
+   키는 Claude가 넣는다. 개발자센터의 API 키 페이지를 열어주고 복사 버튼만 누르게 한 뒤 클립보드에서 바로 넘긴다
+   (`next` 스킬 "비밀 키 받기"). 대화창에 붙여넣어도 받는다. 어느 쪽이든 `.env.local` 에는 쓰지 않는다.
+
    ```bash
-   vercel env rm NEXT_PUBLIC_TOSS_CLIENT_KEY production
-   vercel env add NEXT_PUBLIC_TOSS_CLIENT_KEY production
-   vercel env rm TOSS_SECRET_KEY production
-   vercel env add TOSS_SECRET_KEY production
+   V=$(pbpaste | tr -d '[:space:]')   # 접두사가 live_ 인지 확인한 뒤
+   vercel env rm TOSS_SECRET_KEY production --yes
+   printf '%s' "$V" | vercel env add TOSS_SECRET_KEY production
+   printf '' | pbcopy
    ```
 
-   키 값은 사용자가 입력 창에 직접 붙여넣게 한다. 대화창에 라이브 시크릿 키를 붙여넣지 말라고 먼저 말한다.
+   클라이언트 키(`NEXT_PUBLIC_TOSS_CLIENT_KEY`)도 같은 방법으로 넣는다.
 3. 라이브 MID에 웹훅이 등록되어 있는지 개발자센터에서 확인한다.
 4. 재배포한다. 환경변수는 빌드 때 들어가므로 재배포해야 반영된다.
 

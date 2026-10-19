@@ -53,8 +53,10 @@ Supabase 연결·스키마·로그인(2~4단계)은 하지 않는다. 계정을 
 
 ```
 프로젝트가 생겼어요. 데이터는 지금 파일에 임시로 넣어뒀고, 나중에 데이터베이스로 옮깁니다.
-다음은 화면을 만들 차례예요. /design 이라고 쳐주세요.
+다음은 화면 디자인이에요. 이어서 할까요?
 ```
+
+"네" 면 `design` 스킬을 바로 시작한다 (`next` 스킬 "단계가 끝나면 다음 단계로 바로 간다").
 
 ### 임시 사진 넣기
 
@@ -145,26 +147,34 @@ Next.js 프로젝트가 이미 있고 `.env.local` 에 Supabase 값이 채워져
 
 ### 연결 (처음 쓸 때 한 번)
 
-미리 연결해두지 않는다. **데이터베이스를 처음 만져야 하는 순간** (보통 이 스킬의 2단계) Supabase MCP 도구가 있는지 보고,
-없으면 그 자리에서 연결한다. `/feature`·`/pay`·`/live` 에서 처음 필요해져도 같은 방법으로 연결한다.
-사용자에게 한 줄로 설명한다. "클로드가 데이터베이스를 직접 확인할 수 있게 연결할게요."
+**Supabase는 기본으로 MCP로 다룬다.** 대시보드를 사용자에게 눌러보게 하지 않는다.
+보통 `/start` 의 Supabase 단계에서 연결한다. Supabase 프로젝트 생성부터 MCP로 하기 때문이다.
+`/build`·`/feature`·`/pay`·`/live` 에서 MCP 도구가 안 보이면 그 자리에서 이 절차로 연결한다.
+사용자에게 한 줄로 설명한다. "클로드가 데이터베이스를 직접 만들고 확인할 수 있게 연결할게요."
 
-먼저 프로젝트 ID를 받는다. `.env.local` 의 `NEXT_PUBLIC_SUPABASE_URL` 이 `https://<프로젝트ID>.supabase.co` 형태라 거기서 읽는다.
-(Supabase 대시보드 **Project Settings** → **General** → **Project ID** 와 같다)
+프로젝트 ID는 `.env.local` 의 `NEXT_PUBLIC_SUPABASE_URL` (`https://<프로젝트ID>.supabase.co`) 에서 읽는다.
+아직 Supabase 프로젝트가 없으면 (`.env.local` 에 값이 없음) 프로젝트 ID 없이 연결한다. 프로젝트를 MCP로 만들어야 하기 때문이다.
 
 #### 터미널
 
-1. 프로젝트 폴더에서 **이 프로젝트 하나로 묶어서** 연결한다. `project_ref` 는 빼지 않는다.
-   다른 Supabase 프로젝트가 있는 사람도 엉뚱한 데이터베이스를 건드리지 않게 하는 안전장치다. Claude가 직접 실행한다.
+1. 프로젝트 폴더에서 연결한다. Claude가 직접 실행한다.
+   **프로젝트가 있으면 그 하나로 묶는다** (`project_ref`). 다른 Supabase 프로젝트가 있는 사람도 엉뚱한 데이터베이스를 건드리지 않게 하는 안전장치다.
 
    ```bash
    claude mcp add --scope project --transport http supabase "https://mcp.supabase.com/mcp?project_ref=<프로젝트ID>"
    ```
 
+   **프로젝트가 아직 없으면** `project_ref` 없이 연결한다. 묶여 있으면 `create_project` 같은 계정 단위 도구가 안 보인다.
+   `/start` 가 프로젝트를 만든 뒤 `.mcp.json` 주소에 `?project_ref=<프로젝트ID>` 를 붙인다. 그 전까지는 도구를 쓸 때마다 프로젝트 ID를 직접 넘긴다.
+
+   ```bash
+   claude mcp add --scope project --transport http supabase "https://mcp.supabase.com/mcp"
+   ```
+
 2. `.mcp.json` 에 추가된 서버는 **새 세션을 열어야 잡힌다.** 지금 세션에서 supabase 도구가 안 보이면
    아래 "새 세션으로 넘어갈 때" 를 먼저 한다.
-3. 사용자에게 `/mcp` → 방향키로 supabase 선택 → Enter → **Authenticate** → 브라우저에서 허용하게 한다.
-4. `get_project_url` 이 `.env.local` 과 같은 주소를 돌려주면 연결된 것이다.
+3. 로그인은 사용자만 할 수 있다. `/mcp` → 방향키로 supabase 선택 → Enter → **Authenticate** → 브라우저에서 허용하게 한다.
+4. `get_project_url` 이 `.env.local` 과 같은 주소를 돌려주면 연결된 것이다. 프로젝트가 아직 없으면 `list_organizations` 가 답하면 된다.
 
 `.mcp.json` 에는 주소만 들어가고 로그인 정보는 없다. 커밋해도 된다.
 
@@ -186,7 +196,7 @@ Next.js 프로젝트가 이미 있고 `.env.local` 에 Supabase 값이 채워져
   데이터베이스 도구를 쓸 때마다 **`.env.local` 의 프로젝트 ID를 직접 넘기고**, 첫 호출에서 프로젝트 목록이나 주소를 보고
   `.env.local` 과 같은 프로젝트인지 확인한다. 다르거나 여러 개 중 헷갈리면 사용자에게 묻는다.
 - 추가한 뒤에도 지금 세션에 Supabase 도구가 안 보이면 아래 "새 세션으로 넘어갈 때" 를 한다.
-- 프로젝트 주소가 `.env.local` 과 같게 나오면 연결된 것이다.
+- 프로젝트 주소가 `.env.local` 과 같게 나오면 연결된 것이다. 프로젝트가 아직 없으면 `list_organizations` 가 답하면 된다.
 
 ### 새 세션으로 넘어갈 때
 
@@ -395,7 +405,7 @@ npm run dev
 
 ## 다음
 
-로컬 모드였으면 `/design` 입니다.
+`next` 스킬의 "단계가 끝나면 다음 단계로 바로 간다" 를 따른다. 명령어를 치라고 하지 않는다.
 
-이제 기능을 만들 차례입니다. 기획서의 화면을 하나씩 만들어달라고 하세요.
-다 되면 `/publish` 이라고 치세요.
+- 로컬 모드였으면 다음은 디자인(`design`).
+- 데이터베이스·로그인까지 붙였으면 다음은 결제(`pay`), 그다음 최종 배포(`publish`).
